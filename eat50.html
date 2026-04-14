@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Съешь 50">
+<meta name="apple-mobile-web-app-title" content="Plural">
 <meta name="theme-color" content="#f2f4f0">
-<title>Съешь 50</title>
+<title>Plural</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f2f4f0; color: #1a1a1a; min-height: 100vh; }
@@ -21,11 +21,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
 .name-input:focus { border-color: #4caf6e; }
 .name-btn { width: 100%; padding: 14px; background: #2d7a3a; color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
 
-.header { text-align: center; padding: 20px 0 4px; position: relative; }
-.header h1 { font-size: 21px; font-weight: 600; }
-.header-name { font-size: 13px; color: #888; margin-top: 4px; cursor: pointer; }
+.header { padding: 20px 0 4px; }
+.header-top { display: flex; align-items: center; justify-content: space-between; }
+.header h1 { font-size: 21px; font-weight: 600; flex: 1; text-align: center; }
+.header-name { font-size: 13px; color: #888; margin-top: 4px; cursor: pointer; text-align: center; }
 .header-name:hover { color: #2d7a3a; }
-.share-btn { position: absolute; right: 0; top: 20px; background: #f0f9f2; border: 1px solid #c8e6c9; border-radius: 10px; padding: 7px 12px; font-size: 13px; color: #2d7a3a; cursor: pointer; font-weight: 500; }
+.share-btn { background: #f0f9f2; border: 1px solid #c8e6c9; border-radius: 10px; padding: 7px 12px; font-size: 13px; color: #2d7a3a; cursor: pointer; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
 
 .card { background: #fff; border-radius: 16px; padding: 16px 18px; margin: 12px 0; }
 .slabel { font-size: 11px; color: #aaa; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
@@ -96,7 +97,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
 <div class="name-screen" id="nameScreen" style="display:none">
   <div style="font-size:48px;margin-bottom:16px">🥦</div>
   <h2>Привет! Как тебя зовут?</h2>
-  <p>Это нужно, чтобы персонализировать твой трекер питания</p>
+  <p>Plural помогает отслеживать разнообразие питания и здоровье микробиома</p>
   <input type="text" class="name-input" id="nameInput" placeholder="Твоё имя..." maxlength="30">
   <button class="name-btn" id="nameBtn">Начать</button>
 </div>
@@ -104,9 +105,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
 <!-- MAIN APP -->
 <div class="app" id="mainApp" style="display:none">
   <div class="header">
-    <h1>Съешь 50</h1>
+    <div class="header-top">
+      <div style="width:44px"></div>
+      <h1>Plural</h1>
+      <button class="share-btn" id="shareBtn">Отчёт</button>
+    </div>
     <div class="header-name" id="headerName" onclick="changeName()"></div>
-    <button class="share-btn" id="shareBtn">Поделиться отчётом</button>
   </div>
   <div class="card">
     <div class="counter" id="counter">0 <span>/ 50</span></div>
@@ -115,6 +119,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
     <div class="success" id="success">Цель достигнута — 50 продуктов за неделю!</div>
   </div>
   <div class="card" id="fiberCard"></div>
+  <div class="card" id="microbiomeCard"></div>
   <div class="card" id="rainbowCard"></div>
   <div class="card" id="dynamicsCard"></div>
   <div class="cat-grid" id="catGrid"></div>
@@ -159,7 +164,10 @@ var CATS = [
    items:['Шампиньоны','Вешенки','Лисички','Шиитаке','Портобелло','Опята','Белый гриб']},
   {name:'Травы и специи', icon:'🌿', color:'#2e7d32',
    words:['тимьян','розмарин','орегано','шалфей','эстрагон','куркума','имбирь','корица','кардамон','кориандр','паприка','зира','мускатный','гвоздика','анис','горчица','сумах','барбарис'],
-   items:['Тимьян','Розмарин','Орегано','Шалфей','Эстрагон','Куркума','Имбирь','Корица','Кардамон','Кориандр','Чёрный перец','Паприка','Зира','Мускатный орех','Гвоздика','Анис','Горчица','Сумах','Барбарис']}
+   items:['Тимьян','Розмарин','Орегано','Шалфей','Эстрагон','Куркума','Имбирь','Корица','Кардамон','Кориандр','Чёрный перец','Паприка','Зира','Мускатный орех','Гвоздика','Анис','Горчица','Сумах','Барбарис']},
+  {name:'Ферментированные', icon:'🫙', color:'#0277bd', fermented: true,
+   words:['кефир','йогурт','квашеная капуста','кимчи','мисо','темпе','комбуча','чайный гриб','натто','ряженка','простокваша','айран','тан','кумыс','соленья','мочёные','рассол'],
+   items:['Кефир','Йогурт натуральный','Квашеная капуста','Кимчи','Мисо','Темпе','Комбуча','Натто','Ряженка','Простокваша','Айран','Соленья','Мочёные яблоки']}
 ];
 
 var RAINBOW = [
@@ -173,7 +181,34 @@ var RAINBOW = [
   {name:'Белый',      hex:'#bdbdbd', words:['чеснок','цветная капуста','груша','яблоко','топинамбур','нут','белая фасоль','кешью','миндаль','рис','овёс','полба','рожь','ячмень','гречка','пшено','булгур','кунжут','шампиньон','вешенки','лисички','шиитаке','портобелло','белый гриб','сельдерей','пастернак']}
 ];
 
-// г клетчатки на 100г СУХОГО продукта
+// Пребиотические баллы (на порцию, независимо от граммов)
+var PREBIOTIC = {
+  // Высокий — 3 балла
+  'топинамбур':3,'цикорий':3,'лук':3,'чеснок':3,'лук-порей':3,'спаржа':3,
+  'банан':3,'овёс':3,'ячмень':3,'рожь':3,'чечевица':3,'нут':3,'маш':3,
+  'семена льна':3,'чиа':3,'фенхель':3,'артишок':3,'пастернак':3,
+  // Средний — 2 балла
+  'яблоко':2,'груша':2,'морковь':2,'свёкла':2,'свекла':2,'капуста':2,
+  'брокколи':2,'гречка':2,'фасоль':2,'горох':2,'миндаль':2,'грецкий орех':2,
+  'малина':2,'черника':2,'авокадо':2,'редис':2,'репа':2,'пшено':2,
+  'булгур':2,'эдамаме':2,'адзуки':2,'соя':2,'топинамбур':3,'кукуруза':2,
+  'голубика':2,'ежевика':2,'смородина':2,'крыжовник':2,'брусника':2,
+  'петрушка':2,'укроп':2,'кинза':2,'шпинат':2,'руккола':2,
+  // Низкий — 1 балл
+  'помидор':1,'томат':1,'огурец':1,'перец':1,'кабачок':1,'баклажан':1,
+  'сельдерей':1,'тыква':1,'листовой салат':1,'апельсин':1,'мандарин':1,
+  'лимон':1,'грейпфрут':1,'киви':1,'манго':1,'ананас':1,'персик':1,
+  'нектарин':1,'слива':1,'черешня':1,'абрикос':1,'инжир':1,'хурма':1,
+  'дыня':1,'арбуз':1,'клубника':1,'вишня':1,'клюква':1,'земляника':1,
+  'облепиха':1,'шампиньон':1,'вешенки':1,'лисички':1,'шиитаке':1,
+  'куркума':1,'имбирь':1,'кориандр':1,'зира':1
+};
+
+function getPrebioticScore(name) {
+  var n = name.toLowerCase();
+  for (var key in PREBIOTIC) if (n.indexOf(key) >= 0 || key.indexOf(n) >= 0) return PREBIOTIC[key];
+  return 0;
+}
 var FIBER_DRY = {
   'морковь':2.8,'брокколи':2.6,'цветная капуста':2.0,'шпинат':2.2,'помидор':1.2,'томат':1.2,
   'огурец':0.7,'перец':1.7,'кабачок':1.0,'баклажан':2.5,'свёкла':2.8,'свекла':2.8,
@@ -335,6 +370,67 @@ function renderFiber(log) {
   document.getElementById('fiberCard').innerHTML = html;
 }
 
+function renderMicrobiome(log) {
+  var u = uniq(log);
+  var weekScore = 0;
+  var fermented = [];
+  for (var i = 0; i < u.length; i++) {
+    weekScore += getPrebioticScore(u[i].name);
+    if (u[i].cat === 'Ферментированные') fermented.push(u[i].name);
+  }
+  var WEEK_GOAL = 90;
+  var pct = Math.min(100, Math.round(weekScore / WEEK_GOAL * 100));
+  var level, levelColor, levelBg;
+  if (weekScore < 30) { level = 'Низкий'; levelColor = '#c62828'; levelBg = '#ffebee'; }
+  else if (weekScore < 60) { level = 'Средний'; levelColor = '#f57f17'; levelBg = '#fff8e1'; }
+  else if (weekScore < 90) { level = 'Хороший'; levelColor = '#2d7a3a'; levelBg = '#e8f5ee'; }
+  else { level = 'Отличный'; levelColor = '#0277bd'; levelBg = '#e3f2fd'; }
+
+  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+    + '<div class="slabel" style="margin-bottom:0">Микробиом</div>'
+    + '<button onclick="showPrebioticInfo()" style="background:none;border:1px solid #e0e0e0;border-radius:99px;padding:3px 10px;font-size:11px;color:#aaa;cursor:pointer">Что это?</button>'
+    + '</div>'
+    + '<div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:6px">'
+    + '<div style="font-size:38px;font-weight:700;color:' + levelColor + ';line-height:1">' + weekScore + '</div>'
+    + '<div><div style="font-size:15px;color:#aaa">пребиотических баллов</div>'
+    + '<div style="display:inline-block;margin-top:4px;padding:2px 10px;border-radius:99px;background:' + levelBg + ';color:' + levelColor + ';font-size:12px;font-weight:600">' + level + '</div>'
+    + '</div></div>'
+    + '<div style="background:#f0f0ee;border-radius:99px;height:8px;overflow:hidden;margin-bottom:4px">'
+    + '<div style="height:100%;background:' + levelColor + ';border-radius:99px;width:' + pct + '%;transition:width 0.4s"></div>'
+    + '</div>'
+    + '<div style="font-size:11px;color:#bbb;margin-bottom:14px">цель — ' + WEEK_GOAL + ' баллов в неделю</div>';
+
+  if (fermented.length > 0) {
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#e3f2fd;border-radius:10px;margin-bottom:8px">'
+      + '<span style="font-size:18px">🫙</span>'
+      + '<div><div style="font-size:12px;font-weight:600;color:#0277bd">Ферментированные: ' + fermented.length + '</div>'
+      + '<div style="font-size:11px;color:#0277bd;opacity:0.8">' + fermented.join(', ') + '</div></div>'
+      + '</div>';
+  } else {
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f7f7f5;border-radius:10px;margin-bottom:8px">'
+      + '<span style="font-size:18px">🫙</span>'
+      + '<div style="font-size:12px;color:#bbb">Ферментированных продуктов пока нет — добавь кефир, квашеную капусту или йогурт</div>'
+      + '</div>';
+  }
+
+  // Топ продуктов для улучшения
+  var top3 = ['Топинамбур (3)', 'Лук (3)', 'Чеснок (3)', 'Семена льна (3)', 'Овёс (3)'];
+  var eaten = {};
+  for (var i = 0; i < u.length; i++) eaten[u[i].name.toLowerCase()] = true;
+  var suggest = [];
+  var suggestions = ['Топинамбур','Лук','Чеснок','Семена льна','Овёс','Спаржа','Артишок','Лук-порей','Маш','Чечевица'];
+  for (var i = 0; i < suggestions.length && suggest.length < 3; i++) {
+    if (!eaten[suggestions[i].toLowerCase()]) suggest.push(suggestions[i]);
+  }
+  if (suggest.length > 0) {
+    html += '<div style="font-size:11px;color:#aaa;margin-top:4px">Добавь для роста баллов: '
+      + suggest.map(function(s){ return '<span style="background:#f0f0ee;padding:2px 7px;border-radius:99px;margin-right:4px;color:#555">' + s + '</span>'; }).join('')
+      + '</div>';
+  }
+  html += '</div>';
+  document.getElementById('microbiomeCard').innerHTML = html;
+}
+
 function renderRainbow(log) {
   var u = uniq(log), counts = [];
   for (var i = 0; i < RAINBOW.length; i++) counts.push(0);
@@ -399,7 +495,7 @@ function renderChips() {
         e.stopPropagation(); closePopup(); pendingChip = item;
         var popup = document.createElement('div');
         popup.id = 'chip-popup';
-        popup.style.cssText = 'position:absolute;background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:12px 14px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:100;min-width:240px;left:0;right:0;margin:0 16px;';
+        popup.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid #e0e0e0;border-radius:16px;padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);z-index:1000;width:calc(100% - 48px);max-width:360px;';
         var showCooked = !!catObj.cooked;
         popup.innerHTML = '<div style="font-size:13px;font-weight:600;margin-bottom:8px">' + item + '</div>'
           + (showCooked ? '<div style="display:flex;gap:6px;margin-bottom:8px;">'
@@ -408,14 +504,10 @@ function renderChips() {
             + '</div>' : '')
           + '<div style="display:flex;gap:8px;align-items:center">'
           + '<input id="popup-grams" type="number" min="1" max="2000" placeholder="Граммы..." style="flex:1;padding:8px 10px;border:1px solid #e0e0e0;border-radius:8px;font-size:14px;outline:none;">'
-          + '<button id="popup-skip" style="padding:8px 10px;border:1px solid #e0e0e0;border-radius:8px;background:#f7f7f5;font-size:12px;cursor:pointer;color:#888;white-space:nowrap">Без граммов</button>'
+          + '<button id="popup-skip" style="padding:8px 10px;border:1px solid #c8e6c9;border-radius:8px;background:#f0f9f2;font-size:12px;cursor:pointer;color:#2d7a3a;white-space:nowrap;font-weight:500">Без граммов</button>'
           + '<button id="popup-add" style="padding:8px 12px;border:none;border-radius:8px;background:#2d7a3a;color:#fff;font-size:13px;font-weight:500;cursor:pointer">+</button>'
           + '</div>';
-        var container = ch.closest('.app');
-        var rect = ch.getBoundingClientRect();
-        var containerRect = container.getBoundingClientRect();
-        popup.style.top = (rect.bottom - containerRect.top + window.scrollY + 6) + 'px';
-        container.style.position = 'relative';
+        var container = document.body;
         container.appendChild(popup);
         var gi = popup.querySelector('#popup-grams');
         var cookedMode = false;
@@ -432,7 +524,7 @@ function renderChips() {
     })(cat.items[i], cat);
   }
 }
-document.addEventListener('click', function(e) { var p=document.getElementById('chip-popup'); if (p&&!p.contains(e.target)) closePopup(); });
+document.addEventListener('click', function(e) { var p=document.getElementById('chip-popup'); if (p&&!p.contains(e.target)) { if (pendingChip) { addItem(pendingChip, CATS[activeCat].name, null, false); } closePopup(); } });
 
 function renderFreq(log) {
   var freq = {};
@@ -448,7 +540,10 @@ function renderFreq(log) {
   if (!items.length) { el.innerHTML=''; return; }
   el.innerHTML = '<div class="slabel" style="margin-bottom:10px">Продукты за неделю</div>';
   for (var i = 0; i < items.length; i++) {
-    var item = items[i], cc = catColor(item.cat);
+    var item = items[i];
+    var resolvedCat = item.cat || detectCat(item.name);
+    var rainbowIdx = detectColor(item.name);
+    var cc = rainbowIdx >= 0 ? RAINBOW[rainbowIdx].hex : catColor(resolvedCat);
     var fiberHtml = '';
     if (item.hasGrams) fiberHtml = '<div class="freq-fiber">' + Math.round(item.totalFiber*10)/10 + ' г клетчатки</div>';
     else if (item.inDB) fiberHtml = '<div class="freq-unknown">укажи граммы</div>';
@@ -471,13 +566,21 @@ function buildReport() {
   var u = uniq(log);
   var mon = currentMonday(), sun = new Date(mon.getTime()); sun.setDate(sun.getDate()+6);
   var lines = [];
-  lines.push('🥦 Отчёт «Съешь 50» — ' + name);
+  lines.push('🥦 Отчёт «Plural» — ' + name);
   lines.push(fmtShort(mon) + ' — ' + fmtShort(sun));
   lines.push('');
   lines.push('Уникальных продуктов: ' + u.length + ' / 50');
   var totalFiber = 0;
   for (var i = 0; i < log.length; i++) if (log[i].fiber) totalFiber += log[i].fiber;
   if (totalFiber > 0) lines.push('Клетчатка за неделю: ' + Math.round(totalFiber*10)/10 + ' г');
+  var prebScore = 0;
+  var fermented = [];
+  for (var i = 0; i < u.length; i++) {
+    prebScore += getPrebioticScore(u[i].name);
+    if (u[i].cat === 'Ферментированные') fermented.push(u[i].name);
+  }
+  if (prebScore > 0) lines.push('Пребиотический индекс: ' + prebScore + ' баллов');
+  if (fermented.length > 0) lines.push('Ферментированные: ' + fermented.join(', '));
   var catCounts = {};
   for (var i = 0; i < CATS.length; i++) catCounts[CATS[i].name] = 0;
   for (var i = 0; i < u.length; i++) if (u[i].cat && catCounts[u[i].cat]!==undefined) catCounts[u[i].cat]++;
@@ -493,7 +596,7 @@ function buildReport() {
 document.getElementById('shareBtn').addEventListener('click', function() {
   var text = buildReport();
   if (navigator.share) {
-    navigator.share({title: 'Отчёт Съешь 50', text: text}).catch(function(){});
+    navigator.share({title: 'Отчёт Plural', text: text}).catch(function(){});
   } else {
     navigator.clipboard.writeText(text).then(function() {
       alert('Отчёт скопирован в буфер обмена');
@@ -503,9 +606,62 @@ document.getElementById('shareBtn').addEventListener('click', function() {
   }
 });
 
+function showPrebioticInfo() {
+  var existing = document.getElementById('prebiotic-info-popup');
+  if (existing) { existing.parentNode.removeChild(existing); return; }
+  var overlay = document.createElement('div');
+  overlay.id = 'prebiotic-info-popup';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:2000;display:flex;align-items:flex-end;justify-content:center;';
+  overlay.innerHTML = '<div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    + '<div style="font-size:16px;font-weight:600">Пребиотический индекс</div>'
+    + '<button id="close-prebiotic" style="background:none;border:none;font-size:22px;color:#bbb;cursor:pointer;line-height:1">×</button>'
+    + '</div>'
+
+    + '<div style="font-size:14px;color:#555;line-height:1.7;margin-bottom:16px">'
+    + 'Пребиотики — это пища для твоих бактерий. Не все растительные продукты одинаково полезны для микробиома: одни активно кормят бифидо- и лактобактерии, другие почти не влияют.'
+    + '</div>'
+
+    + '<div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:8px">Как считаются баллы</div>'
+    + '<div style="font-size:13px;color:#555;line-height:1.7;margin-bottom:4px">Каждый уникальный продукт за неделю получает балл в зависимости от пребиотической активности:</div>'
+
+    + '<div style="background:#f7f7f5;border-radius:12px;padding:12px 14px;margin-bottom:16px">'
+    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+    + '<div style="background:#2d7a3a;color:#fff;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700;flex-shrink:0">3</div>'
+    + '<div style="font-size:13px;color:#333"><b>Высокий:</b> топинамбур, лук, чеснок, спаржа, лук-порей, артишок, овёс, рожь, ячмень, чечевица, нут, маш, семена льна, чиа, банан</div>'
+    + '</div>'
+    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+    + '<div style="background:#f57f17;color:#fff;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700;flex-shrink:0">2</div>'
+    + '<div style="font-size:13px;color:#333"><b>Средний:</b> яблоко, груша, морковь, свёкла, капуста, брокколи, гречка, авокадо, малина, черника, миндаль, грецкий орех, фасоль, горох</div>'
+    + '</div>'
+    + '<div style="display:flex;align-items:center;gap:10px">'
+    + '<div style="background:#bbb;color:#fff;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700;flex-shrink:0">1</div>'
+    + '<div style="font-size:13px;color:#333"><b>Низкий:</b> большинство овощей и фруктов</div>'
+    + '</div>'
+    + '</div>'
+
+    + '<div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:8px">Почему цель 90 баллов в неделю</div>'
+    + '<div style="font-size:13px;color:#555;line-height:1.7;margin-bottom:16px">'
+    + 'Исследования (Gibson et al., 2017; Deehan & Walter, 2016) показывают, что для поддержания здорового микробиома нужно ~12–15 пребиотических единиц в день. 90 в неделю — это консервативная нижняя граница. Оптимум — 120+.'
+    + '</div>'
+
+    + '<div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:8px">Важная оговорка</div>'
+    + '<div style="font-size:13px;color:#888;line-height:1.7;margin-bottom:20px">'
+    + 'Единой стандартизированной числовой шкалы в научной литературе нет — индекс в Plural основан на данных об избирательной ферментации из рецензируемых исследований, но является авторской интерпретацией. Используй как ориентир, а не как медицинский показатель.'
+    + '</div>'
+
+    + '<button id="close-prebiotic-btn" style="width:100%;padding:13px;background:#2d7a3a;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer">Понятно</button>'
+    + '</div>';
+
+  document.body.appendChild(overlay);
+  overlay.querySelector('#close-prebiotic').addEventListener('click', function() { document.body.removeChild(overlay); });
+  overlay.querySelector('#close-prebiotic-btn').addEventListener('click', function() { document.body.removeChild(overlay); });
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) document.body.removeChild(overlay); });
+}
+
 function render() {
   var log = loadWeek(currentMonday());
-  renderMain(log); renderFiber(log); renderRainbow(log); renderDynamics(); renderCatGrid(log); renderChips(); renderFreq(log);
+  renderMain(log); renderFiber(log); renderMicrobiome(log); renderRainbow(log); renderDynamics(); renderCatGrid(log); renderChips(); renderFreq(log);
 }
 
 function addItem(name, cat, grams, cooked) {
