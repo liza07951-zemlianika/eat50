@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Съешь 50</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f2f4f0; color: #1a1a1a; min-height: 100vh; }
+.app { max-width: 480px; margin: 0 auto; padding: 16px 16px 48px; }
+.header { text-align: center; padding: 20px 0 8px; }
+.header h1 { font-size: 21px; font-weight: 600; }
+.header p { font-size: 13px; color: #888; margin-top: 4px; }
+.card { background: #fff; border-radius: 16px; padding: 16px 18px; margin: 12px 0; }
+.slabel { font-size: 11px; color: #aaa; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+.counter { font-size: 50px; font-weight: 700; color: #2d7a3a; text-align: center; line-height: 1; }
+.counter span { font-size: 22px; color: #bbb; font-weight: 400; }
+.bar-wrap { margin: 14px 0 6px; background: #eee; border-radius: 99px; height: 10px; overflow: hidden; }
+.bar { height: 100%; background: #4caf6e; border-radius: 99px; transition: width 0.4s; }
+.week-label { font-size: 12px; color: #bbb; text-align: center; }
+.success { background: #e8f5ee; border-radius: 10px; padding: 10px 14px; margin-top: 12px; font-size: 14px; color: #2d7a3a; font-weight: 500; text-align: center; display: none; }
+.rainbow-bar-wrap { height: 26px; border-radius: 8px; overflow: hidden; display: flex; margin: 10px 0 10px; background: #f0f0ee; }
+.rainbow-seg { height: 100%; transition: width 0.4s; }
+.rainbow-legend { display: flex; flex-wrap: wrap; gap: 5px 10px; }
+.rleg { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #555; }
+.rleg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.rleg.off { opacity: 0.3; }
+.dyn-chart { display: flex; align-items: flex-end; gap: 5px; height: 72px; margin-top: 10px; }
+.dyn-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 100%; justify-content: flex-end; }
+.dyn-bar { width: 100%; border-radius: 4px 4px 0 0; background: #c8e6c9; min-height: 2px; }
+.dyn-bar.cur { background: #4caf6e; }
+.dyn-bar.fiber { background: #ffe082; }
+.dyn-bar.fiber.cur { background: #ffb300; }
+.dyn-num { font-size: 11px; font-weight: 600; color: #666; }
+.dyn-lbl { font-size: 10px; color: #bbb; }
+.fiber-today { display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px; }
+.fiber-big { font-size: 38px; font-weight: 700; color: #e65100; line-height: 1; }
+.fiber-unit { font-size: 15px; color: #aaa; }
+.fiber-goal { font-size: 12px; color: #bbb; margin-top: 2px; }
+.fiber-bar-wrap { background: #fff3e0; border-radius: 99px; height: 8px; overflow: hidden; margin-bottom: 4px; }
+.fiber-bar { height: 100%; background: #ffb300; border-radius: 99px; transition: width 0.4s; }
+.cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+.cat-card { background: #fff; border-radius: 12px; padding: 11px 13px; }
+.cat-icon { font-size: 16px; margin-bottom: 2px; }
+.cat-name { font-size: 11px; color: #aaa; }
+.cat-count { font-size: 21px; font-weight: 600; margin-top: 1px; }
+.cat-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.cat-tab { padding: 5px 11px; border-radius: 99px; border: 1px solid #e0e0e0; background: #f7f7f5; font-size: 12px; cursor: pointer; color: #555; }
+.cat-tab.active { background: #2d7a3a; color: #fff; border-color: #2d7a3a; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.chip { padding: 6px 12px; background: #f0f9f2; border: 1px solid #c8e6c9; border-radius: 99px; font-size: 13px; cursor: pointer; color: #2d7a3a; }
+.chip:active { background: #2d7a3a; color: #fff; }
+.add-row { display: flex; gap: 8px; align-items: center; }
+.add-row input.food-inp { flex: 1; padding: 10px 13px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 15px; outline: none; background: #fafafa; min-width: 0; }
+.add-row input.food-inp:focus { border-color: #4caf6e; background: #fff; }
+.add-row input.gram-inp { width: 72px; padding: 10px 8px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 14px; outline: none; background: #fafafa; text-align: center; color: #555; flex-shrink: 0; }
+.add-row input.gram-inp:focus { border-color: #ffb300; background: #fff; }
+.add-row button { padding: 10px 16px; background: #2d7a3a; color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 500; cursor: pointer; flex-shrink: 0; }
+.gram-hint { font-size: 11px; color: #bbb; margin-top: 6px; }
+.freq-item { display: flex; align-items: center; padding: 7px 0; border-bottom: 0.5px solid #f0f0ee; }
+.freq-item:last-child { border-bottom: none; }
+.fdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-right: 9px; }
+.freq-name { flex: 1; font-size: 14px; }
+.freq-cat { font-size: 11px; color: #aaa; margin-right: 6px; }
+.freq-fiber { font-size: 11px; color: #e65100; margin-right: 6px; white-space: nowrap; }
+.freq-cnt { font-size: 12px; font-weight: 600; color: #666; background: #f4f4f2; border-radius: 99px; padding: 2px 9px; margin-right: 6px; white-space: nowrap; }
+.del-btn { background: none; border: none; color: #ddd; font-size: 18px; cursor: pointer; padding: 0; line-height: 1; }
+.del-btn:active { color: #e53935; }
+.reset-btn { display: block; width: 100%; padding: 12px; margin-top: 4px; background: none; border: 1px solid #e8e8e8; border-radius: 10px; color: #ccc; font-size: 13px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>Съешь 50</h1>
+    <p>Разных продуктов за неделю</p>
+  </div>
+  <div class="card">
+    <div class="counter" id="counter">0 <span>/ 50</span></div>
+    <div class="bar-wrap"><div class="bar" id="bar" style="width:0%"></div></div>
+    <div class="week-label" id="weekLabel"></div>
+    <div class="success" id="success">Цель достигнута — 50 продуктов за неделю!</div>
+  </div>
+  <div class="card" id="fiberCard"></div>
+  <div class="card" id="rainbowCard"></div>
+  <div class="card" id="dynamicsCard"></div>
+  <div class="cat-grid" id="catGrid"></div>
+  <div class="card">
+    <div class="slabel">Быстрый выбор</div>
+    <div class="cat-tabs" id="catTabs"></div>
+    <div class="chips" id="chips"></div>
+    <div class="slabel">Свой продукт</div>
+    <div class="add-row">
+      <input type="text" id="inp" class="food-inp" placeholder="Название продукта..." maxlength="60">
+      <input type="number" id="grams" class="gram-inp" placeholder="г" min="1" max="2000">
+      <button id="addBtn">+</button>
+    </div>
+    <div class="gram-hint">Граммы необязательны — нужны для подсчёта клетчатки</div>
+  </div>
+  <div class="card" id="freqCard"></div>
+  <button class="reset-btn" id="resetBtn">Сбросить неделю</button>
+</div>
+<script>
+var CATS = [
+  {name:'Овощи и зелень', icon:'🥕', color:'#e65100',
+   words:['морковь','брокколи','цветная капуста','шпинат','помидор','томат','огурец','перец','кабачок','баклажан','свёкла','свекла','сельдерей','лук','чеснок','редис','тыква','капуста','салат','руккола','фенхель','спаржа','лук-порей','пастернак','репа','топинамбур','артишок','петрушка','укроп','кинза','базилик','мята','тархун','зелёный лук','щавель'],
+   items:['Морковь','Брокколи','Цветная капуста','Шпинат','Помидор','Огурец','Перец','Кабачок','Баклажан','Свёкла','Сельдерей','Лук','Чеснок','Редис','Тыква','Капуста','Листовой салат','Руккола','Фенхель','Спаржа','Лук-порей','Пастернак','Репа','Топинамбур','Артишок','Петрушка','Укроп','Кинза','Базилик','Мята','Тархун','Зелёный лук','Щавель']},
+  {name:'Фрукты', icon:'🍎', color:'#c62828',
+   words:['яблоко','груша','банан','апельсин','мандарин','лимон','грейпфрут','киви','манго','ананас','персик','нектарин','слива','черешня','абрикос','инжир','гранат','папайя','авокадо','хурма','дыня','арбуз'],
+   items:['Яблоко','Груша','Банан','Апельсин','Мандарин','Лимон','Грейпфрут','Киви','Манго','Ананас','Персик','Нектарин','Слива','Черешня','Абрикос','Инжир','Гранат','Папайя','Авокадо','Хурма','Дыня','Арбуз']},
+  {name:'Ягоды', icon:'🫐', color:'#6a1b9a',
+   words:['черника','голубика','малина','клубника','ежевика','смородина','вишня','клюква','брусника','крыжовник','облепиха','земляника'],
+   items:['Черника','Голубика','Малина','Клубника','Ежевика','Смородина','Вишня','Клюква','Брусника','Крыжовник','Облепиха','Земляника']},
+  {name:'Злаки', icon:'🌾', color:'#f57f17',
+   words:['гречка','овёс','овес','киноа','пшено','рис','булгур','полба','рожь','ячмень','кукуруза','амарант','теф','пшеница'],
+   items:['Гречка','Овёс','Киноа','Пшено','Бурый рис','Булгур','Полба','Рожь','Ячмень','Кукуруза','Амарант','Теф','Дикий рис','Пшеница']},
+  {name:'Бобовые', icon:'🫘', color:'#558b2f',
+   words:['чечевица','нут','фасоль','маш','горох','соя','эдамаме','адзуки'],
+   items:['Чечевица','Нут','Фасоль','Маш','Горох','Соя','Эдамаме','Чёрная фасоль','Адзуки','Белая фасоль']},
+  {name:'Орехи/Семена', icon:'🥜', color:'#5d4037',
+   words:['миндаль','грецкий','фундук','кешью','семена льна','чиа','семена тыквы','семена подсолнечника','кунжут','бразильский','пекан','фисташки','кедровые','конопляные','орех','семена','семечки'],
+   items:['Миндаль','Грецкий орех','Фундук','Кешью','Семена льна','Семена чиа','Семена тыквы','Семена подсолнечника','Кунжут','Бразильский орех','Пекан','Фисташки','Кедровые орехи','Конопляные семена']},
+  {name:'Грибы', icon:'🍄', color:'#00695c',
+   words:['шампиньон','вешенки','лисички','шиитаке','портобелло','опята','белый гриб','гриб'],
+   items:['Шампиньоны','Вешенки','Лисички','Шиитаке','Портобелло','Опята','Белый гриб']},
+  {name:'Травы и специи', icon:'🌿', color:'#2e7d32',
+   words:['тимьян','розмарин','орегано','шалфей','эстрагон','куркума','имбирь','корица','кардамон','кориандр','паприка','зира','мускатный','гвоздика','анис','горчица','сумах','барбарис'],
+   items:['Тимьян','Розмарин','Орегано','Шалфей','Эстрагон','Куркума','Имбирь','Корица','Кардамон','Кориандр','Чёрный перец','Паприка','Зира','Мускатный орех','Гвоздика','Анис','Горчица','Сумах','Барбарис']}
+];
+
+var RAINBOW = [
+  {name:'Красный',    hex:'#e53935', words:['помидор','томат','свёкла','свекла','малина','клубника','вишня','гранат','клюква','земляника','арбуз','красный перец','краснокочанн','красная смородина','редис']},
+  {name:'Оранжевый',  hex:'#fb8c00', words:['морковь','тыква','апельсин','мандарин','хурма','папайя','персик','нектарин','абрикос','облепиха','манго']},
+  {name:'Жёлтый',     hex:'#fdd835', words:['лимон','кукуруза','грейпфрут','дыня','ананас','пастернак','репа','имбирь','куркума','банан']},
+  {name:'Зелёный',    hex:'#43a047', words:['брокколи','шпинат','огурец','кабачок','капуста','руккола','спаржа','зелёный лук','укроп','петрушка','кинза','базилик','мята','тархун','щавель','авокадо','горох','эдамаме','маш','киви','листовой салат','фенхель','лук-порей']},
+  {name:'Голубой',    hex:'#29b6f6', words:['голубика']},
+  {name:'Синий',      hex:'#3949ab', words:['черника','баклажан','слива','ежевика','чёрная смородина','чёрная фасоль','адзуки']},
+  {name:'Фиолетовый', hex:'#8e24aa', words:['краснокочанная','красный лук','фиолетовый базилик','инжир']},
+  {name:'Белый',      hex:'#bdbdbd', words:['чеснок','цветная капуста','груша','яблоко','топинамбур','нут','белая фасоль','кешью','миндаль','рис','овёс','полба','рожь','ячмень','гречка','пшено','булгур','кунжут','шампиньон','вешенки','лисички','шиитаке','портобелло','белый гриб','сельдерей','пастернак']}
+];
+
+// Клетчатка г/100г
+var FIBER_DB = {
+  'морковь':2.8,'брокколи':2.6,'цветная капуста':2.0,'шпинат':2.2,'помидор':1.2,'томат':1.2,
+  'огурец':0.7,'перец':1.7,'кабачок':1.0,'баклажан':2.5,'свёкла':2.8,'свекла':2.8,
+  'сельдерей':1.6,'лук':1.7,'чеснок':2.1,'редис':1.6,'тыква':2.0,'капуста':2.5,
+  'листовой салат':1.3,'руккола':1.6,'спаржа':2.1,'лук-порей':1.8,'пастернак':4.9,
+  'репа':1.8,'топинамбур':1.6,'артишок':5.4,'петрушка':3.3,'укроп':2.8,'кинза':2.8,
+  'базилик':1.6,'щавель':0.8,'зелёный лук':1.8,
+  'яблоко':2.4,'груша':3.1,'банан':2.6,'апельсин':2.4,'мандарин':1.8,'лимон':2.8,
+  'грейпфрут':1.7,'киви':3.0,'манго':1.6,'ананас':1.4,'персик':1.5,'нектарин':1.7,
+  'слива':1.4,'черешня':1.1,'абрикос':2.0,'инжир':2.9,'гранат':0.6,'папайя':1.8,
+  'авокадо':6.7,'хурма':3.6,'дыня':0.9,'арбуз':0.4,
+  'черника':2.4,'голубика':2.4,'малина':6.5,'клубника':2.0,'ежевика':5.3,
+  'смородина':4.3,'вишня':1.6,'клюква':4.6,'брусника':2.5,'крыжовник':4.3,'облепиха':2.0,'земляника':2.0,
+  'гречка':10.0,'овёс':10.6,'овес':10.6,'киноа':7.0,'пшено':8.5,'рис':3.5,'булгур':12.8,
+  'полба':10.7,'рожь':15.1,'ячмень':17.3,'кукуруза':7.3,'амарант':6.7,'пшеница':12.2,
+  'чечевица':11.5,'нут':17.4,'фасоль':15.2,'маш':16.3,'горох':16.0,'соя':9.3,'эдамаме':5.2,
+  'адзуки':12.7,
+  'миндаль':12.5,'грецкий орех':6.7,'фундук':9.7,'кешью':3.3,'семена льна':27.3,
+  'чиа':34.4,'семена тыквы':6.5,'семена подсолнечника':8.6,'кунжут':11.8,
+  'бразильский орех':7.5,'пекан':9.6,'фисташки':10.6,'кедровые орехи':3.7,
+  'шампиньон':1.0,'вешенки':2.3,'лисички':3.8,'шиитаке':2.5,'портобелло':1.3,'белый гриб':3.2,
+  'куркума':21.1,'имбирь':2.0,'корица':53.1,'кардамон':28.0,'кориандр':41.9,
+  'зира':10.5,'мускатный орех':20.8,'анис':14.6
+};
+
+function getFiber(name, grams) {
+  if (!grams || grams <= 0) return null;
+  var n = name.toLowerCase();
+  for (var key in FIBER_DB) {
+    if (n.indexOf(key) >= 0 || key.indexOf(n) >= 0) {
+      return Math.round(FIBER_DB[key] * grams / 100 * 10) / 10;
+    }
+  }
+  return null;
+}
+
+var activeCat = 0;
+var FIBER_GOAL = 30;
+var DAY_NAMES = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+
+function localDateStr(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function todayStr() { return localDateStr(new Date()); }
+function currentMonday() {
+  var d = new Date(), day = d.getDay() || 7;
+  d.setDate(d.getDate() - (day - 1)); d.setHours(0,0,0,0); return d;
+}
+function mondayMinus(weeks) {
+  var d = currentMonday(); d.setDate(d.getDate() - weeks * 7); return d;
+}
+function storageKey(mondayDate) { return 'eat50_' + localDateStr(mondayDate); }
+function loadWeek(mondayDate) {
+  try { var r = localStorage.getItem(storageKey(mondayDate)); return r ? JSON.parse(r) : []; } catch(e) { return []; }
+}
+function saveWeek(log) { localStorage.setItem(storageKey(currentMonday()), JSON.stringify(log)); }
+function uniq(log) {
+  var seen = {}, res = [];
+  for (var i = 0; i < log.length; i++) {
+    var k = log[i].name.toLowerCase().trim();
+    if (!seen[k]) { seen[k] = true; res.push(log[i]); }
+  }
+  return res;
+}
+function fmtShort(d) { return d.toLocaleDateString('ru', {day:'numeric', month:'short'}); }
+function detectColor(name) {
+  var n = name.toLowerCase();
+  for (var i = 0; i < RAINBOW.length; i++)
+    for (var j = 0; j < RAINBOW[i].words.length; j++)
+      if (n.indexOf(RAINBOW[i].words[j]) >= 0) return i;
+  return -1;
+}
+function detectCat(name) {
+  var n = name.toLowerCase();
+  for (var i = 0; i < CATS.length; i++)
+    for (var j = 0; j < CATS[i].words.length; j++)
+      if (n.indexOf(CATS[i].words[j]) >= 0) return CATS[i].name;
+  return 'Другое';
+}
+function catColor(catName) {
+  for (var i = 0; i < CATS.length; i++) if (CATS[i].name === catName) return CATS[i].color;
+  return '#bbb';
+}
+
+function renderMain(log) {
+  var u = uniq(log), count = u.length;
+  document.getElementById('counter').innerHTML = count + ' <span>/ 50</span>';
+  document.getElementById('bar').style.width = Math.min(100, Math.round(count / 50 * 100)) + '%';
+  document.getElementById('success').style.display = count >= 50 ? 'block' : 'none';
+  var mon = currentMonday(), sun = new Date(mon.getTime()); sun.setDate(sun.getDate() + 6);
+  document.getElementById('weekLabel').textContent = fmtShort(mon) + ' — ' + fmtShort(sun);
+}
+
+function renderFiber(log) {
+  var today = todayStr();
+  var todayFiber = 0;
+  var dayMap = {};
+  var mon = currentMonday();
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(mon.getTime()); d.setDate(mon.getDate() + i);
+    dayMap[localDateStr(d)] = { label: DAY_NAMES[d.getDay()], fiber: 0, hasData: false };
+  }
+  for (var i = 0; i < log.length; i++) {
+    var e = log[i];
+    if (e.fiber != null) {
+      if (e.isoDate === today) todayFiber += e.fiber;
+      if (dayMap[e.isoDate]) { dayMap[e.isoDate].fiber += e.fiber; dayMap[e.isoDate].hasData = true; }
+    }
+  }
+  todayFiber = Math.round(todayFiber * 10) / 10;
+  var pct = Math.min(100, Math.round(todayFiber / FIBER_GOAL * 100));
+
+  var days = [];
+  for (var k in dayMap) days.push({key: k, label: dayMap[k].label, fiber: Math.round(dayMap[k].fiber*10)/10, hasData: dayMap[k].hasData, isToday: k === today});
+  days.sort(function(a,b){ return a.key < b.key ? -1 : 1; });
+
+  var maxF = 0;
+  for (var i = 0; i < days.length; i++) if (days[i].fiber > maxF) maxF = days[i].fiber;
+  if (maxF < FIBER_GOAL) maxF = FIBER_GOAL;
+
+  var html = '<div class="slabel" style="margin-bottom:10px">Клетчатка</div>'
+    + '<div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:14px">'
+    + '<div class="fiber-big">' + todayFiber + '</div>'
+    + '<div><div class="fiber-unit">г сегодня</div></div>'
+    + '</div>'
+    + '<div class="dyn-chart">';
+
+  for (var i = 0; i < days.length; i++) {
+    var dw = days[i];
+    var h = dw.fiber > 0 ? Math.max(4, Math.round(dw.fiber / maxF * 60)) : 2;
+    var barCls = 'dyn-bar fiber' + (dw.isToday ? ' cur' : '');
+    html += '<div class="dyn-col">'
+      + '<div class="dyn-num" style="color:' + (dw.fiber > 0 ? '#e65100' : '#ddd') + '">' + (dw.fiber > 0 ? dw.fiber : '—') + '</div>'
+      + '<div class="' + barCls + '" style="height:' + h + 'px"></div>'
+      + '<div class="dyn-lbl">' + dw.label + '</div>'
+      + '</div>';
+  }
+  html += '</div>';
+  document.getElementById('fiberCard').innerHTML = html;
+}
+
+function renderRainbow(log) {
+  var u = uniq(log), counts = [];
+  for (var i = 0; i < RAINBOW.length; i++) counts.push(0);
+  for (var i = 0; i < u.length; i++) { var ci = detectColor(u[i].name); if (ci >= 0) counts[ci]++; }
+  var colored = 0; for (var i = 0; i < counts.length; i++) colored += counts[i];
+  var colorsHit = 0; for (var i = 0; i < counts.length; i++) if (counts[i] > 0) colorsHit++;
+  var html = '<div class="slabel" style="margin-bottom:6px">Радуга в тарелке</div>'
+    + '<div style="font-size:13px;color:#555;margin-bottom:4px">' + colorsHit + ' из ' + RAINBOW.length + ' цветов</div>'
+    + '<div class="rainbow-bar-wrap">';
+  if (colored === 0) {
+    html += '<div style="width:100%;background:#f0f0ee"></div>';
+  } else {
+    for (var i = 0; i < RAINBOW.length; i++) {
+      if (counts[i] === 0) continue;
+      var pct = Math.round(counts[i] / colored * 100);
+      html += '<div class="rainbow-seg" style="width:' + pct + '%;background:' + RAINBOW[i].hex + '"></div>';
+    }
+  }
+  html += '</div><div class="rainbow-legend">';
+  for (var i = 0; i < RAINBOW.length; i++) {
+    html += '<div class="rleg' + (counts[i] > 0 ? '' : ' off') + '">'
+      + '<div class="rleg-dot" style="background:' + RAINBOW[i].hex + '"></div>'
+      + RAINBOW[i].name + (counts[i] > 0 ? ' (' + counts[i] + ')' : '') + '</div>';
+  }
+  html += '</div>';
+  document.getElementById('rainbowCard').innerHTML = html;
+}
+
+function renderDynamics() {
+  var weeks = [];
+  for (var i = 5; i >= 0; i--) {
+    var mon = mondayMinus(i), log = loadWeek(mon), cnt = uniq(log).length;
+    weeks.push({lbl: fmtShort(mon), count: cnt, cur: i === 0});
+  }
+  var max = 0; for (var i = 0; i < weeks.length; i++) if (weeks[i].count > max) max = weeks[i].count;
+  if (max === 0) max = 1;
+  var html = '<div class="slabel" style="margin-bottom:0">Динамика по неделям</div><div class="dyn-chart">';
+  for (var i = 0; i < weeks.length; i++) {
+    var w = weeks[i], h = w.count > 0 ? Math.max(6, Math.round(w.count / max * 60)) : 2;
+    html += '<div class="dyn-col">'
+      + '<div class="dyn-num">' + (w.count > 0 ? w.count : '—') + '</div>'
+      + '<div class="dyn-bar' + (w.cur ? ' cur' : '') + '" style="height:' + h + 'px"></div>'
+      + '<div class="dyn-lbl">' + w.lbl + '</div>'
+      + '</div>';
+  }
+  html += '</div>';
+  document.getElementById('dynamicsCard').innerHTML = html;
+}
+
+function renderCatGrid(log) {
+  var u = uniq(log), counts = {};
+  for (var i = 0; i < CATS.length; i++) counts[CATS[i].name] = 0;
+  for (var i = 0; i < u.length; i++) if (u[i].cat && counts[u[i].cat] !== undefined) counts[u[i].cat]++;
+  var grid = document.getElementById('catGrid'); grid.innerHTML = '';
+  for (var i = 0; i < CATS.length; i++) {
+    var c = CATS[i], el = document.createElement('div'); el.className = 'cat-card';
+    el.innerHTML = '<div class="cat-icon">' + c.icon + '</div><div class="cat-name">' + c.name + '</div>'
+      + '<div class="cat-count" style="color:' + c.color + '">' + (counts[c.name] || 0) + '</div>';
+    grid.appendChild(el);
+  }
+}
+
+function renderCatTabs() {
+  var tabs = document.getElementById('catTabs'); tabs.innerHTML = '';
+  for (var i = 0; i < CATS.length; i++) {
+    (function(idx) {
+      var b = document.createElement('button');
+      b.className = 'cat-tab' + (idx === activeCat ? ' active' : '');
+      b.textContent = CATS[idx].icon + ' ' + CATS[idx].name;
+      b.onclick = function() { activeCat = idx; renderCatTabs(); renderChips(); };
+      tabs.appendChild(b);
+    })(i);
+  }
+}
+
+var pendingChip = null;
+
+function closePopup() {
+  var p = document.getElementById('chip-popup');
+  if (p) p.parentNode.removeChild(p);
+  pendingChip = null;
+}
+
+function renderChips() {
+  var cat = CATS[activeCat], el = document.getElementById('chips'); el.innerHTML = '';
+  for (var i = 0; i < cat.items.length; i++) {
+    (function(item, catName) {
+      var ch = document.createElement('div'); ch.className = 'chip'; ch.textContent = item;
+      ch.onclick = function(e) {
+        e.stopPropagation();
+        closePopup();
+        pendingChip = {item: item, catName: catName, anchor: ch};
+        var popup = document.createElement('div');
+        popup.id = 'chip-popup';
+        popup.style.cssText = 'position:absolute;background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:12px 14px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:100;min-width:220px;';
+        popup.innerHTML = '<div style="font-size:13px;font-weight:600;margin-bottom:8px">' + item + '</div>'
+          + '<div style="display:flex;gap:8px;align-items:center">'
+          + '<input id="popup-grams" type="number" min="1" max="2000" placeholder="Граммы..." style="flex:1;padding:8px 10px;border:1px solid #e0e0e0;border-radius:8px;font-size:14px;outline:none;width:100px">'
+          + '<button id="popup-skip" style="padding:8px 10px;border:1px solid #e0e0e0;border-radius:8px;background:#f7f7f5;font-size:13px;cursor:pointer;color:#888;white-space:nowrap">Без граммов</button>'
+          + '<button id="popup-add" style="padding:8px 12px;border:none;border-radius:8px;background:#2d7a3a;color:#fff;font-size:13px;font-weight:500;cursor:pointer">+</button>'
+          + '</div>';
+        var rect = ch.getBoundingClientRect();
+        var container = ch.closest('.app');
+        var containerRect = container.getBoundingClientRect();
+        popup.style.top = (rect.bottom - containerRect.top + 6) + 'px';
+        popup.style.left = Math.max(0, (rect.left - containerRect.left)) + 'px';
+        container.style.position = 'relative';
+        container.appendChild(popup);
+        var gi = popup.querySelector('#popup-grams');
+        gi.focus();
+        popup.querySelector('#popup-add').onclick = function(e) {
+          e.stopPropagation();
+          var g = parseInt(gi.value) || null;
+          addItem(item, catName, g); closePopup();
+        };
+        popup.querySelector('#popup-skip').onclick = function(e) {
+          e.stopPropagation();
+          addItem(item, catName, null); closePopup();
+        };
+        gi.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') { var g = parseInt(gi.value) || null; addItem(item, catName, g); closePopup(); }
+          if (e.key === 'Escape') closePopup();
+        });
+      };
+      el.appendChild(ch);
+    })(cat.items[i], cat.name);
+  }
+}
+document.addEventListener('click', function(e) {
+  var p = document.getElementById('chip-popup');
+  if (p && !p.contains(e.target)) closePopup();
+});
+
+function renderFreq(log) {
+  var freq = {};
+  for (var i = 0; i < log.length; i++) {
+    var k = log[i].name.toLowerCase().trim();
+    if (!freq[k]) freq[k] = {name: log[i].name, cat: log[i].cat, count: 0, lastIdx: i, totalFiber: 0};
+    freq[k].count++;
+    freq[k].lastIdx = i;
+    if (log[i].fiber != null) freq[k].totalFiber += log[i].fiber;
+  }
+  var items = [];
+  for (var k in freq) items.push(freq[k]);
+  items.sort(function(a,b){ return b.count - a.count; });
+  var el = document.getElementById('freqCard');
+  if (!items.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div class="slabel" style="margin-bottom:10px">Продукты за неделю</div>';
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i], cc = catColor(item.cat);
+    var fiberStr = item.totalFiber > 0 ? Math.round(item.totalFiber * 10) / 10 + ' г клетчатки' : '';
+    var row = document.createElement('div'); row.className = 'freq-item';
+    row.innerHTML = '<div class="fdot" style="background:' + cc + '"></div>'
+      + '<div class="freq-name">' + item.name + '</div>'
+      + (fiberStr ? '<div class="freq-fiber">' + fiberStr + '</div>' : '')
+      + '<div class="freq-cat">' + (item.cat === 'Другое' ? '' : (item.cat || '')) + '</div>'
+      + '<div class="freq-cnt">x' + item.count + '</div>'
+      + '<button class="del-btn" data-i="' + item.lastIdx + '">×</button>';
+    el.appendChild(row);
+  }
+  var btns = el.querySelectorAll('.del-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].addEventListener('click', function() { deleteItem(parseInt(this.getAttribute('data-i'))); });
+  }
+}
+
+function render() {
+  var log = loadWeek(currentMonday());
+  renderMain(log);
+  renderFiber(log);
+  renderRainbow(log);
+  renderDynamics();
+  renderCatGrid(log);
+  renderChips();
+  renderFreq(log);
+}
+
+function addItem(name, cat, grams) {
+  var n = name.trim(); if (!n) return;
+  var resolvedCat = cat || detectCat(n);
+  var fiberVal = grams ? getFiber(n, grams) : null;
+  var log = loadWeek(currentMonday());
+  var today = new Date().toLocaleDateString('ru', {day:'numeric', month:'short'});
+  log.push({name: n, cat: resolvedCat, date: today, isoDate: todayStr(), grams: grams || null, fiber: fiberVal});
+  saveWeek(log); render();
+}
+
+function deleteItem(idx) {
+  var log = loadWeek(currentMonday());
+  if (idx >= 0 && idx < log.length) { log.splice(idx, 1); saveWeek(log); render(); }
+}
+
+document.getElementById('addBtn').addEventListener('click', function() {
+  var n = document.getElementById('inp').value.trim(); if (!n) return;
+  var g = parseInt(document.getElementById('grams').value) || null;
+  addItem(n, null, g);
+  document.getElementById('inp').value = '';
+  document.getElementById('grams').value = '';
+});
+
+document.getElementById('inp').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    var n = this.value.trim(); if (!n) return;
+    var g = parseInt(document.getElementById('grams').value) || null;
+    addItem(n, null, g);
+    this.value = ''; document.getElementById('grams').value = '';
+  }
+});
+
+document.getElementById('resetBtn').addEventListener('click', function() {
+  if (confirm('Сбросить все продукты этой недели?')) {
+    localStorage.removeItem(storageKey(currentMonday())); render();
+  }
+});
+
+renderCatTabs();
+render();
+</script>
+</body>
+</html>
