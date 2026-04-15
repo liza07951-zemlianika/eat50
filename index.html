@@ -9,25 +9,21 @@
 <meta name="theme-color" content="#f2f4f0">
 <title>Plural</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f2f4f0; color: #1a1a1a; min-height: 100vh; }
-.app { max-width: 480px; margin: 0 auto; padding: 16px 16px 48px; }
-
-/* NAME SCREEN */
-.name-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; text-align: center; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f2f4f0; color: #1a1a1a; min-height: 100vh; min-height: -webkit-fill-available; }
+.app { max-width: 480px; margin: 0 auto; padding: 16px 16px max(48px, env(safe-area-inset-bottom, 48px)); }
+.name-screen { min-height: 100vh; min-height: -webkit-fill-available; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px max(32px, env(safe-area-inset-bottom, 32px)); text-align: center; }
 .name-screen h2 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
-.name-screen p { font-size: 14px; color: #888; margin-bottom: 28px; line-height: 1.5; }
-.name-input { width: 100%; padding: 14px 16px; border: 1px solid #e0e0e0; border-radius: 12px; font-size: 17px; outline: none; background: #fff; margin-bottom: 12px; }
+.name-screen p { font-size: 15px; color: #888; margin-bottom: 28px; line-height: 1.5; }
+.name-input { width: 100%; padding: 14px 16px; border: 1px solid #e0e0e0; border-radius: 12px; font-size: 17px; outline: none; background: #fff; margin-bottom: 12px; -webkit-appearance: none; }
 .name-input:focus { border-color: #4caf6e; }
-.name-btn { width: 100%; padding: 14px; background: #2d7a3a; color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
-
+.name-btn { width: 100%; padding: 16px; background: #2d7a3a; color: #fff; border: none; border-radius: 12px; font-size: 17px; font-weight: 600; cursor: pointer; min-height: 52px; }
 .header { padding: 20px 0 4px; }
 .header-top { display: flex; align-items: center; justify-content: space-between; }
 .header h1 { font-size: 21px; font-weight: 600; flex: 1; text-align: center; }
-.header-name { font-size: 13px; color: #888; margin-top: 4px; cursor: pointer; text-align: center; }
-.header-name:hover { color: #2d7a3a; }
-.share-btn { background: #f0f9f2; border: 1px solid #c8e6c9; border-radius: 10px; padding: 7px 12px; font-size: 13px; color: #2d7a3a; cursor: pointer; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
-
+.header-name { font-size: 13px; color: #888; margin-top: 4px; cursor: pointer; text-align: center; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+.share-btn { background: #f0f9f2; border: 1px solid #c8e6c9; border-radius: 10px; padding: 8px 12px; font-size: 13px; color: #2d7a3a; cursor: pointer; font-weight: 500; white-space: nowrap; flex-shrink: 0; min-height: 36px; }
 .card { background: #fff; border-radius: 16px; padding: 16px 18px; margin: 12px 0; }
 .slabel { font-size: 11px; color: #aaa; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
 .counter { font-size: 50px; font-weight: 700; color: #2d7a3a; text-align: center; line-height: 1; }
@@ -36,14 +32,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
 .bar { height: 100%; background: #4caf6e; border-radius: 99px; transition: width 0.4s; }
 .week-label { font-size: 12px; color: #bbb; text-align: center; }
 .success { background: #e8f5ee; border-radius: 10px; padding: 10px 14px; margin-top: 12px; font-size: 14px; color: #2d7a3a; font-weight: 500; text-align: center; display: none; }
-
-.rainbow-bar-wrap { height: 26px; border-radius: 8px; overflow: hidden; display: flex; margin: 10px 0 10px; background: #f0f0ee; }
+.rainbow-bar-wrap { height: 26px; border-radius: 8px; overflow: hidden; display: flex; margin: 10px 0; background: #f0f0ee; }
 .rainbow-seg { height: 100%; transition: width 0.4s; }
 .rainbow-legend { display: flex; flex-wrap: wrap; gap: 5px 10px; }
 .rleg { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #555; }
 .rleg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .rleg.off { opacity: 0.3; }
-
 .dyn-chart { display: flex; align-items: flex-end; gap: 5px; height: 72px; margin-top: 10px; }
 .dyn-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 100%; justify-content: flex-end; }
 .dyn-bar { width: 100%; border-radius: 4px 4px 0 0; background: #c8e6c9; min-height: 2px; }
@@ -52,43 +46,42 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
 .dyn-bar.fiber.cur { background: #ffb300; }
 .dyn-num { font-size: 11px; font-weight: 600; color: #666; }
 .dyn-lbl { font-size: 10px; color: #bbb; }
-
 .fiber-big { font-size: 38px; font-weight: 700; color: #e65100; line-height: 1; }
 .fiber-unit { font-size: 15px; color: #aaa; }
-
 .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
 .cat-card { background: #fff; border-radius: 12px; padding: 11px 13px; }
 .cat-icon { font-size: 16px; margin-bottom: 2px; }
 .cat-name { font-size: 11px; color: #aaa; }
 .cat-count { font-size: 21px; font-weight: 600; margin-top: 1px; }
-
 .cat-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-.cat-tab { padding: 5px 11px; border-radius: 99px; border: 1px solid #e0e0e0; background: #f7f7f5; font-size: 12px; cursor: pointer; color: #555; }
+.cat-tab { padding: 8px 12px; border-radius: 99px; border: 1px solid #e0e0e0; background: #f7f7f5; font-size: 13px; cursor: pointer; color: #555; min-height: 36px; }
 .cat-tab.active { background: #2d7a3a; color: #fff; border-color: #2d7a3a; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-.chip { padding: 6px 12px; background: #f0f9f2; border: 1px solid #c8e6c9; border-radius: 99px; font-size: 13px; cursor: pointer; color: #2d7a3a; }
+.chip { padding: 8px 14px; background: #f0f9f2; border: 1px solid #c8e6c9; border-radius: 99px; font-size: 14px; cursor: pointer; color: #2d7a3a; min-height: 36px; display: flex; align-items: center; }
 .chip:active { background: #2d7a3a; color: #fff; }
-
 .add-row { display: flex; gap: 8px; align-items: center; }
-.food-inp { flex: 1; padding: 10px 13px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 15px; outline: none; background: #fafafa; min-width: 0; }
+.food-inp { flex: 1; padding: 12px 13px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 16px; outline: none; background: #fafafa; min-width: 0; min-height: 44px; -webkit-appearance: none; }
 .food-inp:focus { border-color: #4caf6e; background: #fff; }
-.gram-inp { width: 68px; padding: 10px 8px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 14px; outline: none; background: #fafafa; text-align: center; color: #555; flex-shrink: 0; }
+.gram-inp { width: 68px; padding: 12px 8px; border: 1px solid #e0e0e0; border-radius: 10px; font-size: 15px; outline: none; background: #fafafa; text-align: center; color: #555; flex-shrink: 0; min-height: 44px; -webkit-appearance: none; }
 .gram-inp:focus { border-color: #ffb300; background: #fff; }
-.add-btn { padding: 10px 16px; background: #2d7a3a; color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 500; cursor: pointer; flex-shrink: 0; }
-.gram-hint { font-size: 11px; color: #bbb; margin-top: 6px; }
-
-.freq-item { display: flex; align-items: center; padding: 7px 0; border-bottom: 0.5px solid #f0f0ee; }
+.add-btn { padding: 12px 16px; background: #2d7a3a; color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: 500; cursor: pointer; flex-shrink: 0; min-height: 44px; min-width: 44px; }
+.gram-hint { font-size: 12px; color: #bbb; margin-top: 6px; }
+.freq-item { display: flex; align-items: center; padding: 9px 0; border-bottom: 0.5px solid #f0f0ee; min-height: 44px; }
 .freq-item:last-child { border-bottom: none; }
-.fdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-right: 9px; }
+.fdot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-right: 9px; }
 .freq-name { flex: 1; font-size: 14px; }
 .freq-fiber { font-size: 11px; color: #e65100; margin-right: 6px; white-space: nowrap; }
 .freq-unknown { font-size: 11px; color: #bbb; margin-right: 6px; white-space: nowrap; }
 .freq-cat { font-size: 11px; color: #aaa; margin-right: 6px; }
-.freq-cnt { font-size: 12px; font-weight: 600; color: #666; background: #f4f4f2; border-radius: 99px; padding: 2px 9px; margin-right: 6px; white-space: nowrap; }
-.del-btn { background: none; border: none; color: #ddd; font-size: 18px; cursor: pointer; padding: 0; line-height: 1; }
+.freq-cnt { font-size: 12px; font-weight: 600; color: #666; background: #f4f4f2; border-radius: 99px; padding: 3px 9px; margin-right: 6px; white-space: nowrap; }
+.del-btn { background: none; border: none; color: #ddd; font-size: 20px; cursor: pointer; padding: 0; line-height: 1; min-width: 32px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
 .del-btn:active { color: #e53935; }
-
-.reset-btn { display: block; width: 100%; padding: 12px; margin-top: 4px; background: none; border: 1px solid #e8e8e8; border-radius: 10px; color: #ccc; font-size: 13px; cursor: pointer; }
+.reset-btn { display: block; width: 100%; padding: 14px; margin-top: 4px; background: none; border: 1px solid #e8e8e8; border-radius: 10px; color: #ccc; font-size: 14px; cursor: pointer; min-height: 48px; }
+.sheet-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: flex-end; justify-content: center; }
+.sheet-inner { background: #fff; border-radius: 20px 20px 0 0; width: 100%; max-width: 480px; max-height: 88vh; max-height: 88dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 12px 20px max(32px, env(safe-area-inset-bottom, 32px)); }
+.sheet-handle { width: 36px; height: 4px; background: #e0e0e0; border-radius: 99px; margin: 0 auto 20px; }
+.center-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 8px 40px rgba(0,0,0,0.2); z-index: 3000; width: calc(100vw - 48px); max-width: 360px; max-height: 80vh; max-height: 80dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+button:active { opacity: 0.75; }
 </style>
 </head>
 <body>
@@ -508,7 +501,7 @@ function renderChips() {
         e.stopPropagation(); closePopup(); pendingChip = item;
         var popup = document.createElement('div');
         popup.id = 'chip-popup';
-        popup.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid #e0e0e0;border-radius:16px;padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);z-index:1000;width:calc(100% - 48px);max-width:360px;';
+        popup.className = 'center-popup';
         var showCooked = !!catObj.cooked;
         popup.innerHTML = '<div style="font-size:13px;font-weight:600;margin-bottom:8px">' + item + '</div>'
           + (showCooked ? '<div style="display:flex;gap:6px;margin-bottom:8px;">'
@@ -687,8 +680,8 @@ function showInfoPopup(html) {
   if (existing) { existing.parentNode.removeChild(existing); return; }
   var overlay = document.createElement('div');
   overlay.id = 'info-popup';
-  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:2000;display:flex;align-items:flex-end;justify-content:center;';
-  overlay.innerHTML = '<div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;">'
+  overlay.className = 'sheet-overlay';
+  overlay.innerHTML = '<div class="sheet-inner">'
     + html
     + '<button onclick="document.getElementById(\'info-popup\').remove()" style="width:100%;padding:13px;background:#2d7a3a;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:20px">Понятно</button>'
     + '</div>';
@@ -781,8 +774,8 @@ function showPrebioticInfo() {
   if (existing) { existing.parentNode.removeChild(existing); return; }
   var overlay = document.createElement('div');
   overlay.id = 'prebiotic-info-popup';
-  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:2000;display:flex;align-items:flex-end;justify-content:center;';
-  overlay.innerHTML = '<div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;">'
+  overlay.className = 'sheet-overlay';
+  overlay.innerHTML = '<div class="sheet-inner">'
     + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
     + '<div style="font-size:16px;font-weight:600">Пребиотический индекс</div>'
     + '<button id="close-prebiotic" style="background:none;border:none;font-size:22px;color:#bbb;cursor:pointer;line-height:1">×</button>'
@@ -879,7 +872,7 @@ function showShoppingList() {
 
   var overlay = document.createElement('div');
   overlay.id = 'shopping-popup';
-  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:2000;display:flex;align-items:flex-end;justify-content:center;';
+  overlay.className = 'sheet-overlay';
 
   function buildListText() {
     var t = '🛒 Plural — список покупок\n' + new Date().toLocaleDateString('ru', {day:'numeric', month:'long'}) + '\n\n';
@@ -986,7 +979,7 @@ function showShoppingList() {
     });
   }
 
-  overlay.innerHTML = '<div class="shop-inner" style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;">'
+  overlay.innerHTML = '<div class="sheet-inner">'
     + buildInnerHtml() + '</div>';
 
   document.body.appendChild(overlay);
@@ -1036,7 +1029,7 @@ function showWellnessPopup() {
 
   var overlay = document.createElement('div');
   overlay.id = 'wellness-popup';
-  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:2000;display:flex;align-items:flex-end;justify-content:center;';
+  overlay.className = 'sheet-overlay';
 
   var state = {
     bloating: today.bloating || 0,       // 0=нет 1=лёгкое 2=сильное
@@ -1047,7 +1040,7 @@ function showWellnessPopup() {
   };
 
   function html() {
-    var h = '<div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;">';
+    var h = '<div class="sheet-inner">';
     h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">'
       + '<div style="font-size:16px;font-weight:600">Самочувствие сегодня</div>'
       + '<button id="wclose" style="background:none;border:none;font-size:22px;color:#bbb;cursor:pointer">×</button>'
