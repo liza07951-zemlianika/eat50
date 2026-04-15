@@ -19,11 +19,48 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .name-input { width: 100%; padding: 14px 16px; border: 1px solid #e0e0e0; border-radius: 12px; font-size: 17px; outline: none; background: #fff; margin-bottom: 12px; -webkit-appearance: none; }
 .name-input:focus { border-color: #4caf6e; }
 .name-btn { width: 100%; padding: 16px; background: #2d7a3a; color: #fff; border: none; border-radius: 12px; font-size: 17px; font-weight: 600; cursor: pointer; min-height: 52px; }
-.header { padding: 20px 0 4px; }
+.header { padding: 20px 0 8px; }
 .header-top { display: flex; align-items: center; justify-content: space-between; }
-.header h1 { font-size: 21px; font-weight: 600; flex: 1; text-align: center; }
-.header-name { font-size: 13px; color: #888; margin-top: 4px; cursor: pointer; text-align: center; min-height: 44px; display: flex; align-items: center; justify-content: center; }
-.share-btn { background: #f0f9f2; border: 1px solid #c8e6c9; border-radius: 10px; padding: 8px 12px; font-size: 13px; color: #2d7a3a; cursor: pointer; font-weight: 500; white-space: nowrap; flex-shrink: 0; min-height: 36px; }
+.header-brand { display: flex; align-items: center; gap: 8px; }
+.header-title {
+  font-size: 22px;
+  font-weight: 300;
+  color: #1a1a1a;
+  letter-spacing: 0.5px;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 2px;
+}
+.header-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #FA9109;
+  border-radius: 99px;
+}
+.header-name { font-size: 13px; color: #aaa; margin-top: 5px; cursor: pointer; min-height: 28px; display: flex; align-items: center; }
+.share-btn { background: #f0f9f2; border: 1px solid #c8e6c9; border-radius: 10px; padding: 8px 14px; font-size: 13px; color: #2d7a3a; cursor: pointer; font-weight: 500; white-space: nowrap; flex-shrink: 0; min-height: 36px; }
+.action-panel { display: flex; gap: 8px; margin: 4px 0 14px; }
+.action-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 12px 6px; border-radius: 14px; border: none; cursor: pointer; font-size: 12px; font-weight: 500; min-height: 64px; }
+.action-btn-green { background: #e8f5ee; color: #2d7a3a; }
+.action-btn-purple { background: #f0f4ff; color: #5c6bc0; }
+.action-btn-gray { background: #f4f4f2; color: #888; }
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+.dash-card { background: #fff; border-radius: 16px; padding: 14px; cursor: pointer; position: relative; min-height: 110px; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.1s; }
+.dash-card:active { transform: scale(0.97); }
+.dash-label { font-size: 11px; color: #aaa; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+.dash-value { font-size: 32px; font-weight: 700; line-height: 1; }
+.dash-sub { font-size: 12px; color: #aaa; margin-top: 4px; }
+.dash-arrow { position: absolute; top: 12px; right: 12px; font-size: 14px; color: #e0e0e0; }
+.dash-bar { height: 4px; border-radius: 99px; background: #eee; overflow: hidden; margin-top: 8px; }
+.dash-bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s; }
+.dash-rainbow { display: flex; gap: 3px; margin-top: 8px; }
+.dash-rainbow-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.dash-mini-chart { display: flex; align-items: flex-end; gap: 3px; height: 32px; margin-top: 6px; }
+.dash-mini-bar { flex: 1; border-radius: 2px 2px 0 0; min-height: 2px; background: #c8e6c9; }
+.dash-mini-bar.cur { background: #4caf6e; }
 .card { background: #fff; border-radius: 16px; padding: 16px 18px; margin: 12px 0; }
 .slabel { font-size: 11px; color: #aaa; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
 .counter { font-size: 50px; font-weight: 700; color: #2d7a3a; text-align: center; line-height: 1; }
@@ -99,11 +136,29 @@ button:active { opacity: 0.75; }
 <div class="app" id="mainApp" style="display:none">
   <div class="header">
     <div class="header-top">
-      <div style="width:44px"></div>
-      <h1>Plural</h1>
+      <div class="header-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#FA9109"></circle><path d="M22.3116 19.051C25.7346 12.9656 20.2832 11.3176 17.3673 11.8247C14.705 10.1765 9.30427 8.7059 9 16.0083C9 18.2903 11.1299 23.3107 13.564 25.1363C15.2121 26.0237 18.6912 25.4873 22.3116 19.051Z" stroke="white"></path><path d="M17.3672 11.8246C17.3672 10.6606 16.7843 8.36589 14.645 7.10826C14.0107 6.73539 13.3649 7.33478 13.6482 8.0138C14.2487 9.4533 15.4149 11.1739 17.3672 11.8246ZM17.3672 11.8246C18.0011 11.3175 19.1928 9.77085 18.8886 7.641C18.5843 5.51114 17.7476 9.54265 17.3672 11.8246ZM17.3672 11.8246C18.895 11.7155 21.7943 11.0616 22.766 9.32912C23.0328 8.85339 22.6307 8.35237 22.0972 8.46578C20.937 8.71239 19.166 9.57622 17.3672 11.8246Z" stroke="white"></path><path d="M20.7939 14.4642C20.8035 14.5504 20.842 14.7533 20.8687 14.879C20.9028 15.0396 20.9388 15.2699 20.9508 15.4434C20.9533 15.6589 20.9437 15.8112 20.9268 15.8401C20.9195 15.8546 20.9148 15.869 20.9098 15.8838" stroke="white" stroke-linecap="round"></path><path d="M17.6795 13.8848C17.6795 13.9566 17.67 14.14 17.6362 14.2896C17.5975 14.5604 17.5686 14.7049 17.5324 14.845C17.5203 14.8932 17.506 14.9602 17.4912 15.0726" stroke="white" stroke-linecap="round"></path><path d="M18.8379 17.173C18.8379 17.2402 18.8188 17.423 18.7825 17.5516C18.7521 17.6594 18.7269 17.7567 18.6956 17.839C18.6497 17.9593 18.5534 18.1429 18.5049 18.2277C18.4952 18.2447 18.4856 18.2591 18.4735 18.2712C18.4614 18.2834 18.4471 18.293 18.4033 18.3318" stroke="white" stroke-linecap="round"></path><path d="M15.4775 18.0276C15.4775 18.0372 15.4728 18.2572 15.4631 18.6022C15.4486 18.8433 15.4199 19.0546 15.4027 19.1958C15.4003 19.2152 15.3956 19.2296 15.3906 19.2444" stroke="white" stroke-linecap="round"></path><path d="M14.5942 14.0731C14.5894 14.121 14.5033 14.3802 14.4423 14.5771C14.3875 14.7539 14.3578 14.8596 14.3312 14.9539C14.309 15.0322 14.2805 15.0963 14.2635 15.1617C14.2611 15.1786 14.2611 15.1977 14.2587 15.2147C14.2563 15.2318 14.2515 15.2461 14.2466 15.2609" stroke="white" stroke-linecap="round"></path><path d="M12.0884 12.6535C11.997 12.7545 11.843 13.033 11.7698 13.2132C11.7256 13.3221 11.6926 13.4786 11.654 13.6932C11.6347 13.7779 11.6248 13.8363 11.6224 13.882C11.6201 13.9039 11.6153 13.923 11.6104 13.9862" stroke="white" stroke-linecap="round"></path><path d="M11.4507 16.8543C11.4507 16.8925 11.4507 17.1465 11.4555 17.5229C11.4844 17.805 11.5085 17.9691 11.5326 18.0656C11.5424 18.1047 11.5472 18.1238 11.5521 18.158" stroke="white" stroke-linecap="round"></path><path d="M12.9717 20.4756C12.9717 20.4852 12.9717 20.7434 12.9741 21.1416C13.0148 21.4212 13.0779 21.6004 13.0923 21.6533C13.1019 21.6824 13.1162 21.7158 13.1455 21.7793" stroke="white" stroke-linecap="round"></path><path d="M16.3179 21.9966C16.3179 22.0589 16.2892 22.2324 16.2552 22.3727C16.2118 22.5521 16.1058 22.7588 15.9877 22.9204C15.7341 23.2611 15.6227 23.3677 15.5986 23.3894C15.5888 23.4015 15.584 23.4158 15.5791 23.4306" stroke="white" stroke-linecap="round"></path><path d="M19.1426 20.5915C19.0948 20.6154 19.047 20.6393 18.9028 20.7663C18.7587 20.8934 18.5197 21.1228 18.2734 21.3737" stroke="white" stroke-linecap="round"></path></svg>
+        <span class="header-title">plural<span class="header-underline"></span></span>
+      </div>
       <button class="share-btn" id="shareBtn">Отчёт</button>
     </div>
     <div class="header-name" id="headerName" onclick="changeName()"></div>
+  </div>
+
+  <!-- ACTION PANEL -->
+  <div class="action-panel">
+    <button class="action-btn action-btn-green" id="shopBtn">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h12l-1.5 8H5.5L4 4z"/><circle cx="8" cy="17" r="1"/><circle cx="14" cy="17" r="1"/><path d="M2 2h2l.5 2"/></svg>
+      Покупки
+    </button>
+    <button class="action-btn action-btn-purple" id="wellnessBtn">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3.5C10 3.5 4 7 4 12a6 6 0 0012 0c0-5-6-8.5-6-8.5z"/><path d="M10 8v5M7.5 10.5h5"/></svg>
+      Самочувствие
+    </button>
+    <button class="action-btn action-btn-gray" id="resetBtn">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 10a6 6 0 1112 0"/><path d="M4 10l-2-2 2-2"/></svg>
+      Сброс
+    </button>
   </div>
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
@@ -115,10 +170,7 @@ button:active { opacity: 0.75; }
     <div class="week-label" id="weekLabel"></div>
     <div class="success" id="success">Цель достигнута — 50 продуктов за неделю!</div>
   </div>
-  <div class="card" id="fiberCard"></div>
-  <div class="card" id="microbiomeCard"></div>
-  <div class="card" id="rainbowCard"></div>
-  <div class="card" id="dynamicsCard"></div>
+  <div class="dashboard-grid" id="dashboardGrid"></div>
   <div class="cat-grid" id="catGrid"></div>
   <div class="card">
     <div class="slabel">Быстрый выбор</div>
@@ -133,10 +185,6 @@ button:active { opacity: 0.75; }
     <div class="gram-hint">Граммы необязательны — нужны для подсчёта клетчатки</div>
   </div>
   <div class="card" id="freqCard"></div>
-  <div class="card" id="wellnessCard"></div>
-  <button class="reset-btn" style="background:#f0f9f2;border-color:#c8e6c9;color:#2d7a3a;font-weight:500;margin-bottom:8px" id="shopBtn">Список покупок на неделю</button>
-  <button class="reset-btn" style="background:#f0f4ff;border-color:#c5c8f6;color:#5c6bc0;font-weight:500;margin-bottom:8px" id="wellnessBtn">Самочувствие сегодня</button>
-  <button class="reset-btn" id="resetBtn">Сбросить неделю</button>
 </div>
 
 <script>
@@ -1251,9 +1299,451 @@ function renderWellness() {
   el.innerHTML = html;
 }
 
+function renderDashboard(log) {
+  var u = uniq(log);
+  var grid = document.getElementById('dashboardGrid');
+  if (!grid) return;
+
+  // 1. Клетчатка сегодня
+  var todayFiber = 0;
+  var today = todayStr();
+  for (var i = 0; i < log.length; i++) if (log[i].fiber && log[i].isoDate === today) todayFiber += log[i].fiber;
+  todayFiber = Math.round(todayFiber * 10) / 10;
+
+  // 2. Микробиом
+  var prebScore = 0, fermentedCount = 0;
+  for (var i = 0; i < u.length; i++) {
+    prebScore += getPrebioticScore(u[i].name);
+    if (u[i].cat === 'Ферментированные') fermentedCount++;
+  }
+  var prebLevel = prebScore < 30 ? 'Низкий' : prebScore < 60 ? 'Средний' : prebScore < 90 ? 'Хороший' : 'Отличный';
+  var prebColor = prebScore < 30 ? '#c62828' : prebScore < 60 ? '#f57f17' : prebScore < 90 ? '#2d7a3a' : '#0277bd';
+
+  // 3. Радуга
+  var colorHits = [];
+  for (var i = 0; i < RAINBOW.length; i++) {
+    var hit = false;
+    for (var j = 0; j < u.length; j++) {
+      var n = u[j].name.toLowerCase();
+      for (var k = 0; k < RAINBOW[i].words.length; k++) {
+        if (n.indexOf(RAINBOW[i].words[k]) >= 0) { hit = true; break; }
+      }
+      if (hit) break;
+    }
+    colorHits.push(hit);
+  }
+  var totalColors = colorHits.filter(Boolean).length;
+
+  // 4. Динамика
+  var weekCounts = [];
+  for (var i = 5; i >= 0; i--) {
+    var wlog = loadWeek(mondayMinus(i));
+    weekCounts.push({ count: uniq(wlog).length, cur: i === 0 });
+  }
+  var maxWC = Math.max.apply(null, weekCounts.map(function(w){ return w.count; })) || 1;
+
+  // 5. Самочувствие — мини-график по дням
+  var wellnessDays = loadWeekWellness();
+  var filledDays = wellnessDays.filter(function(d){ return d.data && d.data.energy > 0; });
+  var avgEnergy = filledDays.length > 0
+    ? Math.round(filledDays.reduce(function(s,d){ return s+d.data.energy; },0) / filledDays.length * 10) / 10 : 0;
+  var wellnessExtra = '<div style="display:flex;align-items:flex-end;gap:3px;height:28px;margin-top:6px">';
+  wellnessDays.forEach(function(d) {
+    var e = d.data ? d.data.energy : 0;
+    var h = e > 0 ? Math.max(3, Math.round(e/5*24)) : 2;
+    wellnessExtra += '<div style="flex:1;border-radius:2px 2px 0 0;height:'+h+'px;background:'+(d.isToday?'#5c6bc0':(e>0?'#c5c8f6':'#eee'))+'"></div>';
+  });
+  wellnessExtra += '</div>';
+
+  // 6. Сравнение с прошлой неделей
+  var prevLog = loadWeek(mondayMinus(1));
+  var prevU = uniq(prevLog);
+  var prevCount = prevU.length;
+  var diffCount = u.length - prevCount;
+  var prevWellness = [];
+  var prevMon = mondayMinus(1);
+  for (var i = 0; i < 7; i++) {
+    var pd = new Date(prevMon.getTime()); pd.setDate(prevMon.getDate()+i);
+    var pw = loadWellness(localDateStr(pd));
+    if (pw && pw.energy > 0) prevWellness.push(pw.energy);
+  }
+  var prevAvgEnergy = prevWellness.length > 0
+    ? Math.round(prevWellness.reduce(function(s,v){ return s+v; },0) / prevWellness.length * 10) / 10 : 0;
+  var diffEnergy = avgEnergy > 0 && prevAvgEnergy > 0
+    ? Math.round((avgEnergy - prevAvgEnergy) * 10) / 10 : null;
+  var compExtra = '<div style="margin-top:8px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+    + '<span style="font-size:11px;color:#aaa">Продукты</span>'
+    + '<span style="font-size:12px;font-weight:600;color:'+(diffCount>0?'#2d7a3a':diffCount<0?'#c62828':'#aaa')+'">'
+    + (diffCount>0?'+':'')+diffCount+(prevCount>0?' (было '+prevCount+')':' нет данных')+'</span></div>'
+    + '<div style="display:flex;justify-content:space-between;align-items:center">'
+    + '<span style="font-size:11px;color:#aaa">Энергия</span>'
+    + '<span style="font-size:12px;font-weight:600;color:'+(diffEnergy!==null?(diffEnergy>0?'#2d7a3a':diffEnergy<0?'#c62828':'#aaa'):'#aaa')+'">'
+    + (diffEnergy!==null?(diffEnergy>0?'+':'')+diffEnergy:'нет данных')+'</span></div></div>';
+
+  var cards = [
+    // Клетчатка
+    { id: 'dash-fiber', bg: '#fff8f2', accent: '#e65100',
+      label: 'Клетчатка', value: todayFiber + ' г', sub: 'сегодня',
+      extra: '', onclick: 'showDetailFiber()' },
+    // Микробиом
+    { id: 'dash-micro', bg: '#f0fff4', accent: prebColor,
+      label: 'Микробиом', value: prebScore, sub: prebLevel,
+      extra: '<div class="dash-bar"><div class="dash-bar-fill" style="width:'+Math.min(100,Math.round(prebScore/90*100))+'%;background:'+prebColor+'"></div></div>',
+      onclick: 'showDetailMicrobiome()' },
+    // Радуга
+    { id: 'dash-rainbow', bg: '#fffef0', accent: '#f57f17',
+      label: 'Радуга', value: totalColors + '/8', sub: 'цветов',
+      extra: '<div class="dash-rainbow">' + RAINBOW.map(function(r, i){ return '<div class="dash-rainbow-dot" style="background:' + r.hex + ';opacity:' + (colorHits[i]?'1':'0.15') + '"></div>'; }).join('') + '</div>',
+      onclick: 'showDetailRainbow()' },
+    // Динамика
+    { id: 'dash-dyn', bg: '#f0f9f2', accent: '#4caf6e',
+      label: 'Динамика', value: weekCounts[5].count, sub: 'эта неделя',
+      extra: '<div class="dash-mini-chart">' + weekCounts.map(function(w){ var h = w.count > 0 ? Math.max(3, Math.round(w.count/maxWC*28)) : 2; return '<div class="dash-mini-bar' + (w.cur?' cur':'') + '" style="height:'+h+'px"></div>'; }).join('') + '</div>',
+      onclick: 'showDetailDynamics()' },
+    // Самочувствие
+    { id: 'dash-well', bg: '#f5f0ff', accent: '#5c6bc0',
+      label: 'Самочувствие', value: avgEnergy > 0 ? avgEnergy + '/5' : '—', sub: filledDays.length > 0 ? 'ср. энергия · ' + filledDays.length + ' дн.' : 'не заполнено',
+      extra: wellnessExtra,
+      onclick: 'showDetailWellness()' },
+    // Сравнение
+    { id: 'dash-compare', bg: '#f0f4ff', accent: '#3949ab',
+      label: 'Vs прошлая неделя', value: diffCount > 0 ? '+'+diffCount : diffCount === 0 ? '=' : String(diffCount), sub: 'продуктов',
+      extra: compExtra,
+      onclick: 'showDetailCompare()' }
+  ];
+
+  grid.innerHTML = '';
+  cards.forEach(function(c) {
+    var el = document.createElement('div');
+    el.className = 'dash-card';
+    el.style.background = c.bg;
+    el.id = c.id;
+    el.innerHTML = '<div class="dash-arrow">›</div>'
+      + '<div><div class="dash-label">' + c.label + '</div>'
+      + '<div class="dash-value" style="color:' + c.accent + '">' + c.value + '</div>'
+      + '<div class="dash-sub">' + c.sub + '</div></div>'
+      + (c.extra ? c.extra : '');
+    el.onclick = new Function(c.onclick);
+    grid.appendChild(el);
+  });
+}
+
+function makeDetailSheet(title, renderFn, infoFn, infoBtnText) {
+  var existing = document.querySelector('.sheet-overlay');
+  if (existing) existing.remove();
+  var el = document.createElement('div'); el.className = 'sheet-overlay';
+  var inner = document.createElement('div'); inner.className = 'sheet-inner';
+  inner.innerHTML = '<div class="sheet-handle"></div>'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    + '<div style="font-size:17px;font-weight:600">' + title + '</div>'
+    + '<button id="detail-close-btn" style="background:none;border:none;font-size:24px;color:#bbb;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center">×</button></div>'
+    + '<div id="detail-content"></div>';
+  if (infoFn) {
+    var btn = document.createElement('button');
+    btn.className = 'sheet-btn-secondary'; btn.style.marginTop = '12px';
+    btn.textContent = infoBtnText;
+    btn.onclick = infoFn;
+    inner.appendChild(btn);
+  }
+  el.appendChild(inner);
+  document.body.appendChild(el);
+  inner.querySelector('#detail-close-btn').onclick = function(){ el.remove(); };
+  el.addEventListener('click', function(e){ if(e.target===el) el.remove(); });
+  renderFn(document.getElementById('detail-content'));
+}
+
+function showDetailFiber() {
+  var log = loadWeek(currentMonday());
+  makeDetailSheet('Клетчатка', function(container) {
+    var today = todayStr(), todayFiber = 0;
+    var dayMap = {}, mon = currentMonday();
+    for (var i = 0; i < 7; i++) {
+      var d = new Date(mon.getTime()); d.setDate(mon.getDate()+i);
+      dayMap[localDateStr(d)] = {label: DAY_NAMES[d.getDay()], fiber: 0};
+    }
+    for (var i = 0; i < log.length; i++) {
+      var e = log[i];
+      if (e.fiber != null) {
+        if (e.isoDate === today) todayFiber += e.fiber;
+        if (dayMap[e.isoDate]) dayMap[e.isoDate].fiber += e.fiber;
+      }
+    }
+    todayFiber = Math.round(todayFiber * 10) / 10;
+    var days = [];
+    for (var k in dayMap) days.push({key:k, label:dayMap[k].label, fiber: Math.round(dayMap[k].fiber*10)/10, isToday: k===today});
+    days.sort(function(a,b){ return a.key < b.key ? -1 : 1; });
+    var maxF = 0; for (var i = 0; i < days.length; i++) if (days[i].fiber > maxF) maxF = days[i].fiber;
+    if (maxF === 0) maxF = 30;
+    var html = '<div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:14px">'
+      + '<div class="fiber-big">' + todayFiber + '</div>'
+      + '<div><div class="fiber-unit">г сегодня</div></div></div>'
+      + '<div class="dyn-chart">';
+    for (var i = 0; i < days.length; i++) {
+      var dw = days[i], h = dw.fiber > 0 ? Math.max(4, Math.round(dw.fiber/maxF*60)) : 2;
+      html += '<div class="dyn-col"><div class="dyn-num" style="color:'+(dw.fiber>0?'#e65100':'#ddd')+'">'+(dw.fiber>0?dw.fiber:'—')+'</div>'
+        + '<div class="dyn-bar fiber'+(dw.isToday?' cur':'')+'" style="height:'+h+'px"></div>'
+        + '<div class="dyn-lbl">'+dw.label+'</div></div>';
+    }
+    html += '</div>';
+    container.innerHTML = html;
+  }, showInfoFiber, 'Что такое клетчатка?');
+}
+
+function showDetailMicrobiome() {
+  var log = loadWeek(currentMonday());
+  makeDetailSheet('Микробиом', function(container) {
+    var u = uniq(log);
+    var weekScore = 0, fermented = [];
+    for (var i = 0; i < u.length; i++) {
+      weekScore += getPrebioticScore(u[i].name);
+      if (u[i].cat === 'Ферментированные') fermented.push(u[i].name);
+    }
+    var WEEK_GOAL = 90;
+    var pct = Math.min(100, Math.round(weekScore / WEEK_GOAL * 100));
+    var level, levelColor, levelBg;
+    if (weekScore < 30) { level='Низкий'; levelColor='#c62828'; levelBg='#ffebee'; }
+    else if (weekScore < 60) { level='Средний'; levelColor='#f57f17'; levelBg='#fff8e1'; }
+    else if (weekScore < 90) { level='Хороший'; levelColor='#2d7a3a'; levelBg='#e8f5ee'; }
+    else { level='Отличный'; levelColor='#0277bd'; levelBg='#e3f2fd'; }
+    var html = '<div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:6px">'
+      + '<div style="font-size:38px;font-weight:700;color:'+levelColor+';line-height:1">'+weekScore+'</div>'
+      + '<div><div style="font-size:15px;color:#aaa">пребиотических баллов</div>'
+      + '<div style="display:inline-block;margin-top:4px;padding:2px 10px;border-radius:99px;background:'+levelBg+';color:'+levelColor+';font-size:12px;font-weight:600">'+level+'</div></div></div>'
+      + '<div style="background:#f0f0ee;border-radius:99px;height:8px;overflow:hidden;margin-bottom:4px">'
+      + '<div style="height:100%;background:'+levelColor+';border-radius:99px;width:'+pct+'%;transition:width 0.4s"></div></div>'
+      + '<div style="font-size:11px;color:#bbb;margin-bottom:14px">цель — '+WEEK_GOAL+' баллов в неделю</div>';
+    if (fermented.length > 0) {
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#e3f2fd;border-radius:10px;margin-bottom:8px">'
+        + '<span style="font-size:18px">🫙</span><div><div style="font-size:12px;font-weight:600;color:#0277bd">Ферментированные: '+fermented.length+'</div>'
+        + '<div style="font-size:11px;color:#0277bd;opacity:0.8">'+fermented.join(', ')+'</div></div></div>';
+    } else {
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f7f7f5;border-radius:10px;margin-bottom:8px">'
+        + '<span style="font-size:18px">🫙</span><div style="font-size:12px;color:#bbb">Ферментированных продуктов пока нет</div></div>';
+    }
+    var eaten = {}; for (var i=0;i<u.length;i++) eaten[u[i].name.toLowerCase()]=true;
+    var suggest=[], suggestions=['Топинамбур','Лук','Чеснок','Семена льна','Овёс','Спаржа','Артишок','Лук-порей','Маш','Чечевица'];
+    for (var i=0;i<suggestions.length&&suggest.length<3;i++) if (!eaten[suggestions[i].toLowerCase()]) suggest.push(suggestions[i]);
+    if (suggest.length>0) html += '<div style="font-size:11px;color:#aaa;margin-top:4px">Добавь для роста баллов: '+suggest.map(function(s){ return '<span style="background:#f0f0ee;padding:2px 7px;border-radius:99px;margin-right:4px;color:#555">'+s+'</span>'; }).join('')+'</div>';
+    container.innerHTML = html;
+  }, showPrebioticInfo, 'Что такое пребиотический индекс?');
+}
+
+function showDetailRainbow() {
+  var log = loadWeek(currentMonday());
+  makeDetailSheet('Радуга в тарелке', function(container) {
+    var u = uniq(log), counts = [];
+    for (var i=0;i<RAINBOW.length;i++) counts.push(0);
+    for (var i=0;i<u.length;i++) { var ci=detectColor(u[i].name); if(ci>=0) counts[ci]++; }
+    var colored=0; for(var i=0;i<counts.length;i++) colored+=counts[i];
+    var colorsHit=0; for(var i=0;i<counts.length;i++) if(counts[i]>0) colorsHit++;
+    var html='<div style="font-size:13px;color:#555;margin-bottom:4px">'+colorsHit+' из '+RAINBOW.length+' цветов</div>'
+      +'<div class="rainbow-bar-wrap">';
+    if(colored===0) html+='<div style="width:100%;background:#f0f0ee"></div>';
+    else for(var i=0;i<RAINBOW.length;i++){ if(!counts[i]) continue; html+='<div class="rainbow-seg" style="width:'+Math.round(counts[i]/colored*100)+'%;background:'+RAINBOW[i].hex+'"></div>'; }
+    html+='</div><div class="rainbow-legend">';
+    for(var i=0;i<RAINBOW.length;i++) html+='<div class="rleg'+(counts[i]>0?'':' off')+'"><div class="rleg-dot" style="background:'+RAINBOW[i].hex+'"></div>'+RAINBOW[i].name+(counts[i]>0?' ('+counts[i]+')':'')+'</div>';
+    html+='</div>';
+    container.innerHTML = html;
+  }, showInfoRainbow, 'Что означают цвета?');
+}
+
+function showDetailDynamics() {
+  var existing = document.querySelector('.sheet-overlay'); if (existing) existing.remove();
+  var el = document.createElement('div'); el.className = 'sheet-overlay';
+  var inner = document.createElement('div'); inner.className = 'sheet-inner';
+  var metrics = [
+    { key: 'products', label: 'Продукты', color: '#4caf6e' },
+    { key: 'fiber',    label: 'Клетчатка', color: '#e65100' },
+    { key: 'prebiotic',label: 'Микробиом', color: '#2d7a3a' },
+    { key: 'energy',   label: 'Энергия',   color: '#5c6bc0' }
+  ];
+  var activeMetric = 0;
+
+  function getWeekData(metric) {
+    var result = [];
+    for (var i = 5; i >= 0; i--) {
+      var mon = mondayMinus(i);
+      var log = loadWeek(mon);
+      var u = uniq(log);
+      var val = 0;
+      if (metric === 'products') {
+        val = u.length;
+      } else if (metric === 'fiber') {
+        for (var j = 0; j < log.length; j++) if (log[j].fiber) val += log[j].fiber;
+        val = Math.round(val * 10) / 10;
+      } else if (metric === 'prebiotic') {
+        for (var j = 0; j < u.length; j++) val += getPrebioticScore(u[j].name);
+      } else if (metric === 'energy') {
+        var energyVals = [];
+        for (var d = 0; d < 7; d++) {
+          var dd = new Date(mon.getTime()); dd.setDate(mon.getDate()+d);
+          var w = loadWellness(localDateStr(dd));
+          if (w && w.energy > 0) energyVals.push(w.energy);
+        }
+        val = energyVals.length > 0 ? Math.round(energyVals.reduce(function(s,v){return s+v;},0)/energyVals.length*10)/10 : 0;
+      }
+      result.push({ val: val, lbl: fmtShort(mon), cur: i === 0 });
+    }
+    return result;
+  }
+
+  function renderChart() {
+    var m = metrics[activeMetric];
+    var data = getWeekData(m.key);
+    var max = Math.max.apply(null, data.map(function(d){ return d.val; })) || 1;
+    var html = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">';
+    metrics.forEach(function(mt, idx) {
+      html += '<button onclick="setMetric('+idx+')" style="padding:6px 12px;border-radius:99px;border:1px solid '+(idx===activeMetric?m.color:'#e0e0e0')+';background:'+(idx===activeMetric?m.color:'#f7f7f5')+';color:'+(idx===activeMetric?'#fff':'#555')+';font-size:12px;cursor:pointer;font-weight:'+(idx===activeMetric?'600':'400')+'">'+mt.label+'</button>';
+    });
+    html += '</div><div class="dyn-chart">';
+    data.forEach(function(d) {
+      var h = d.val > 0 ? Math.max(4, Math.round(d.val/max*60)) : 2;
+      html += '<div class="dyn-col">'
+        + '<div class="dyn-num" style="color:'+(d.val>0?m.color:'#ddd')+'">'+(d.val>0?d.val:'—')+'</div>'
+        + '<div style="width:100%;border-radius:4px 4px 0 0;height:'+h+'px;background:'+(d.cur?m.color:'#e0e0e0')+'"></div>'
+        + '<div class="dyn-lbl">'+d.lbl+'</div></div>';
+    });
+    html += '</div>';
+    document.getElementById('dyn-chart-content').innerHTML = html;
+  }
+
+  inner.innerHTML = '<div class="sheet-handle"></div>'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    + '<div style="font-size:17px;font-weight:600">Динамика</div>'
+    + '<button id="dyn-close" style="background:none;border:none;font-size:24px;color:#bbb;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center">×</button></div>'
+    + '<div id="dyn-chart-content"></div>';
+  el.appendChild(inner);
+  document.body.appendChild(el);
+  inner.querySelector('#dyn-close').onclick = function(){ el.remove(); };
+  el.addEventListener('click', function(e){ if(e.target===el) el.remove(); });
+
+  window.setMetric = function(idx) { activeMetric = idx; renderChart(); };
+  renderChart();
+}
+
+function showDetailCompare() {
+  makeDetailSheet('Сравнение недель', function(container) {
+    var thisLog = loadWeek(currentMonday());
+    var prevLog = loadWeek(mondayMinus(1));
+    var thisU = uniq(thisLog), prevU = uniq(prevLog);
+
+    // Энергия
+    function avgEnergyForWeek(mon) {
+      var vals = [];
+      for (var i = 0; i < 7; i++) {
+        var d = new Date(mon.getTime()); d.setDate(mon.getDate()+i);
+        var w = loadWellness(localDateStr(d));
+        if (w && w.energy > 0) vals.push(w.energy);
+      }
+      return vals.length > 0 ? Math.round(vals.reduce(function(s,v){return s+v;},0)/vals.length*10)/10 : null;
+    }
+    var thisEnergy = avgEnergyForWeek(currentMonday());
+    var prevEnergy = avgEnergyForWeek(mondayMinus(1));
+
+    function row(label, thisVal, prevVal, unit, goodDir) {
+      var diff = (thisVal !== null && prevVal !== null) ? Math.round((thisVal - prevVal) * 10) / 10 : null;
+      var diffColor = diff === null ? '#bbb' : (diff === 0 ? '#aaa' : ((goodDir === 1 ? diff > 0 : diff < 0) ? '#2d7a3a' : '#c62828'));
+      var diffStr = diff === null ? 'нет данных' : (diff > 0 ? '+' : '') + diff + (unit||'');
+      return '<div style="display:flex;align-items:center;padding:12px 0;border-bottom:0.5px solid #f0f0ee">'
+        + '<div style="flex:1;font-size:14px;font-weight:500">'+label+'</div>'
+        + '<div style="text-align:right">'
+        + '<div style="font-size:13px;color:#aaa">'+(prevVal!==null?prevVal+(unit||''):'-')+' → <span style="color:#1a1a1a;font-weight:600">'+(thisVal!==null?thisVal+(unit||''):'-')+'</span></div>'
+        + '<div style="font-size:12px;font-weight:600;color:'+diffColor+'">'+diffStr+'</div>'
+        + '</div></div>';
+    }
+
+    var html = row('Продукты', thisU.length, prevU.length, '', 1);
+    html += row('Энергия', thisEnergy, prevEnergy, '/5', 1);
+    container.innerHTML = html || '<div style="font-size:13px;color:#bbb;text-align:center;padding:20px 0">Нет данных за прошлую неделю</div>';
+  }, null, null);
+}
+
+function showDetailCats() {
+  var log = loadWeek(currentMonday());
+  var u = uniq(log);
+  var catCounts = {};
+  CATS.forEach(function(c){ catCounts[c.name] = 0; });
+  u.forEach(function(e){ if (e.cat && catCounts[e.cat]!==undefined) catCounts[e.cat]++; });
+  var el = document.createElement('div'); el.className = 'sheet-overlay';
+  var inner = document.createElement('div'); inner.className = 'sheet-inner';
+  var html = '<div class="sheet-handle"></div>'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    + '<div style="font-size:17px;font-weight:600">По категориям</div>'
+    + '<button onclick="this.closest(\'.sheet-overlay\').remove()" style="background:none;border:none;font-size:24px;color:#bbb;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center">×</button></div>';
+  CATS.forEach(function(cat) {
+    var cnt = catCounts[cat.name] || 0;
+    var pct = Math.min(100, Math.round(cnt / (cat.items.length) * 100));
+    html += '<div style="margin-bottom:14px">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">'
+      + '<div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">'+cat.icon+'</span><span style="font-size:14px;font-weight:500">'+cat.name+'</span></div>'
+      + '<span style="font-size:13px;font-weight:600;color:'+cat.color+'">'+cnt+'</span></div>'
+      + '<div style="background:#eee;border-radius:99px;height:5px;overflow:hidden">'
+      + '<div style="height:100%;border-radius:99px;background:'+cat.color+';width:'+pct+'%"></div></div></div>';
+  });
+  inner.innerHTML = html;
+  el.appendChild(inner);
+  document.body.appendChild(el);
+  el.addEventListener('click', function(e){ if(e.target===el) el.remove(); });
+}
+
+function showDetailWellness() {
+  makeDetailSheet('Самочувствие', function(container) {
+    var days = loadWeekWellness();
+    var hasAny = days.some(function(d){ return d.data; });
+    if (!hasAny) {
+      container.innerHTML = '<div style="font-size:13px;color:#ccc;text-align:center;padding:20px 0">Нажми «Самочувствие» чтобы начать заполнять</div>';
+      return;
+    }
+    var bloatLabels = ['нет','лёгкое','сильное'];
+    var bristolLabels = ['','твёрдый','норма','мягкий','жидкий'];
+    // Энергия по дням
+    var maxE = 5;
+    var html = '<div style="font-size:11px;color:#aaa;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;font-weight:600">Энергия</div>'
+      + '<div class="dyn-chart" style="margin-bottom:16px">';
+    days.forEach(function(d) {
+      var e = d.data ? d.data.energy : 0;
+      var h = e > 0 ? Math.max(4, Math.round(e/maxE*60)) : 2;
+      html += '<div class="dyn-col"><div class="dyn-num" style="color:'+(e>0?'#5c6bc0':'#ddd')+'">'+(e>0?e:'—')+'</div>'
+        + '<div style="width:100%;border-radius:4px 4px 0 0;height:'+h+'px;background:'+(d.isToday?'#5c6bc0':'#c5c8f6')+'"></div>'
+        + '<div class="dyn-lbl">'+d.label+'</div></div>';
+    });
+    html += '</div>';
+    // Вздутие
+    html += '<div style="font-size:11px;color:#aaa;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;font-weight:600">Вздутие</div>'
+      + '<div style="display:flex;gap:5px;margin-bottom:16px">';
+    days.forEach(function(d) {
+      var bv = d.data ? d.data.bloating : -1;
+      var bg = bv >= 0 ? ['#e8f5ee','#fff8e1','#ffebee'][bv] : '#f7f7f5';
+      var tc = bv >= 0 ? ['#2d7a3a','#f57f17','#c62828'][bv] : '#ddd';
+      html += '<div style="flex:1;border-radius:8px;background:'+bg+';padding:5px 2px;text-align:center">'
+        + '<div style="font-size:9px;color:'+tc+';font-weight:600;line-height:1.3">'+(bv>=0?bloatLabels[bv]:'—')+'</div>'
+        + '<div style="font-size:9px;color:#bbb">'+d.label+'</div></div>';
+    });
+    html += '</div>';
+    // Подробно по дням
+    var filledDays = days.filter(function(d){ return d.data; });
+    if (filledDays.length > 0) {
+      html += '<div style="font-size:11px;color:#aaa;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.04em;font-weight:600">Детально</div>';
+      filledDays.forEach(function(d) {
+        var w = d.data;
+        html += '<div style="padding:10px 12px;background:#f7f7f5;border-radius:10px;margin-bottom:8px;font-size:13px">'
+          + '<div style="font-weight:600;margin-bottom:4px">'+['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][new Date(d.iso).getDay()]+' · энергия '+w.energy+'/5</div>'
+          + '<div style="color:#888">Вздутие: '+bloatLabels[w.bloating||0]+(w.bloatingTime&&w.bloatingTime.length>0?' ('+w.bloatingTime.join(', ')+')'  : '')+'</div>'
+          + (w.bristol>0?'<div style="color:#888">Стул: '+bristolLabels[w.bristol]+'</div>':'')
+          + '</div>';
+      });
+    }
+    container.innerHTML = html;
+  }, null, null);
+}
+
 function render() {
   var log = loadWeek(currentMonday());
-  renderMain(log); renderFiber(log); renderMicrobiome(log); renderRainbow(log); renderDynamics(); renderCatGrid(log); renderChips(); renderFreq(log); renderWellness();
+  renderMain(log);
+  renderDashboard(log);
+  renderChips();
+  renderFreq(log);
 }
 
 function addItem(name, cat, grams, cooked) {
