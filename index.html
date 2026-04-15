@@ -140,7 +140,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #
     <div class="gram-hint">Граммы необязательны — нужны для подсчёта клетчатки</div>
   </div>
   <div class="card" id="freqCard"></div>
+  <div class="card" id="wellnessCard"></div>
   <button class="reset-btn" style="background:#f0f9f2;border-color:#c8e6c9;color:#2d7a3a;font-weight:500;margin-bottom:8px" id="shopBtn">Список покупок на неделю</button>
+  <button class="reset-btn" style="background:#f0f4ff;border-color:#c5c8f6;color:#5c6bc0;font-weight:500;margin-bottom:8px" id="wellnessBtn">Самочувствие сегодня</button>
   <button class="reset-btn" id="resetBtn">Сбросить неделю</button>
 </div>
 
@@ -577,30 +579,93 @@ function buildReport() {
   var u = uniq(log);
   var mon = currentMonday(), sun = new Date(mon.getTime()); sun.setDate(sun.getDate()+6);
   var lines = [];
-  lines.push('🥦 Отчёт «Plural» — ' + name);
-  lines.push(fmtShort(mon) + ' — ' + fmtShort(sun));
+  lines.push('🌿 Plural — отчёт за неделю');
+  lines.push(name + ' · ' + fmtShort(mon) + ' — ' + fmtShort(sun));
   lines.push('');
+
+  // ПРОДУКТЫ
+  lines.push('📊 РАЗНООБРАЗИЕ');
   lines.push('Уникальных продуктов: ' + u.length + ' / 50');
+  var prevLog = loadWeek(mondayMinus(1));
+  var prevCount = uniq(prevLog).length;
+  if (prevCount > 0) {
+    var diff = u.length - prevCount;
+    lines.push('Прошлая неделя: ' + prevCount + ' (' + (diff >= 0 ? '+' : '') + diff + ')');
+  }
+
+  // РАДУГА
+  var colorHits = 0;
+  for (var i = 0; i < RAINBOW.length; i++) {
+    for (var j = 0; j < u.length; j++) {
+      var n = u[j].name.toLowerCase();
+      var found = false;
+      for (var k = 0; k < RAINBOW[i].words.length; k++) {
+        if (n.indexOf(RAINBOW[i].words[k]) >= 0) { found = true; break; }
+      }
+      if (found) { colorHits++; break; }
+    }
+  }
+  lines.push('Цветов радуги: ' + colorHits + ' / ' + RAINBOW.length);
+  lines.push('');
+
+  // КЛЕТЧАТКА
   var totalFiber = 0;
   for (var i = 0; i < log.length; i++) if (log[i].fiber) totalFiber += log[i].fiber;
-  if (totalFiber > 0) lines.push('Клетчатка за неделю: ' + Math.round(totalFiber*10)/10 + ' г');
-  var prebScore = 0;
-  var fermented = [];
+  if (totalFiber > 0) {
+    lines.push('🌱 КЛЕТЧАТКА');
+    lines.push('За неделю: ' + Math.round(totalFiber*10)/10 + ' г');
+    lines.push('');
+  }
+
+  // МИКРОБИОМ
+  var prebScore = 0, fermented = [];
   for (var i = 0; i < u.length; i++) {
     prebScore += getPrebioticScore(u[i].name);
     if (u[i].cat === 'Ферментированные') fermented.push(u[i].name);
   }
-  if (prebScore > 0) lines.push('Пребиотический индекс: ' + prebScore + ' баллов');
-  if (fermented.length > 0) lines.push('Ферментированные: ' + fermented.join(', '));
+  lines.push('🦠 МИКРОБИОМ');
+  lines.push('Пребиотический индекс: ' + prebScore + ' / 90 баллов');
+  if (fermented.length > 0) lines.push('Ферментированные (' + fermented.length + '): ' + fermented.join(', '));
+  else lines.push('Ферментированные: не добавлено');
+  lines.push('');
+
+  // КАТЕГОРИИ
   var catCounts = {};
   for (var i = 0; i < CATS.length; i++) catCounts[CATS[i].name] = 0;
   for (var i = 0; i < u.length; i++) if (u[i].cat && catCounts[u[i].cat]!==undefined) catCounts[u[i].cat]++;
+  lines.push('🗂 ПО КАТЕГОРИЯМ');
+  for (var i = 0; i < CATS.length; i++) {
+    if (catCounts[CATS[i].name] > 0) lines.push('  ' + CATS[i].icon + ' ' + CATS[i].name + ': ' + catCounts[CATS[i].name]);
+  }
   lines.push('');
-  lines.push('По категориям:');
-  for (var i = 0; i < CATS.length; i++) if (catCounts[CATS[i].name]>0) lines.push('  ' + CATS[i].icon + ' ' + CATS[i].name + ': ' + catCounts[CATS[i].name]);
-  lines.push('');
-  lines.push('Все продукты:');
+
+  // САМОЧУВСТВИЕ
+  var wellnessDays = loadWeekWellness();
+  var filledDays = wellnessDays.filter(function(d) { return d.data; });
+  if (filledDays.length > 0) {
+    lines.push('💜 САМОЧУВСТВИЕ');
+    var bloatLabels = ['нет','лёгкое','сильное'];
+    var bristolLabels = ['','твёрдый (1-2)','норма (3-4)','мягкий (5-6)','жидкий (7)'];
+    var freqLabels = ['реже 1 раза','1-2 раза','3+ раз'];
+    for (var i = 0; i < filledDays.length; i++) {
+      var d = filledDays[i], w = d.data;
+      var line = DAY_NAMES[new Date(d.iso).getDay()] + ': ';
+      line += 'энергия ' + w.energy + '/5';
+      if (w.bloating !== undefined) line += ' · вздутие: ' + bloatLabels[w.bloating];
+      if (w.bloatingTime && w.bloatingTime.length > 0) line += ' (' + w.bloatingTime.join(', ') + ')';
+      if (w.bristol > 0) line += ' · стул: ' + bristolLabels[w.bristol];
+      if (w.stoolFreq !== undefined) line += ' · ' + freqLabels[w.stoolFreq];
+      lines.push('  ' + line);
+    }
+    var avgEnergy = Math.round(filledDays.reduce(function(s,d){ return s + d.data.energy; }, 0) / filledDays.length * 10) / 10;
+    lines.push('  Средняя энергия за неделю: ' + avgEnergy + '/5');
+    lines.push('');
+  }
+
+  // ВСЕ ПРОДУКТЫ
+  lines.push('🥗 ВСЕ ПРОДУКТЫ (' + u.length + ')');
   for (var i = 0; i < u.length; i++) lines.push('  • ' + u[i].name);
+
   return lines.join('\n');
 }
 
@@ -775,42 +840,36 @@ function showShoppingList() {
     }
   }
 
-  // Для каждой категории смотрим сколько съедено и предлагаем чего не хватает
-  var suggestions = [];
   var TARGETS = {
     'Овощи и зелень': 8, 'Фрукты': 4, 'Ягоды': 3, 'Злаки': 4,
     'Бобовые': 3, 'Орехи/Семена': 3, 'Грибы': 2,
     'Травы и специи': 3, 'Ферментированные': 2
   };
 
+  // Для каждой категории собираем полный пул незасчитанных продуктов
+  var suggestions = [];
   for (var ci = 0; ci < CATS.length; ci++) {
     var cat = CATS[ci];
     var eatenInCat = eaten[cat.name] || [];
     var target = TARGETS[cat.name] || 3;
     var gap = target - eatenInCat.length;
     if (gap <= 0) continue;
-
-    // Найти продукты из категории которых ещё не ели
-    var notEaten = [];
+    var pool = [];
     for (var ii = 0; ii < cat.items.length; ii++) {
       var item = cat.items[ii];
-      var alreadyEaten = false;
+      var already = false;
       for (var jj = 0; jj < eatenInCat.length; jj++) {
-        if (eatenInCat[jj] === item.toLowerCase()) { alreadyEaten = true; break; }
+        if (eatenInCat[jj] === item.toLowerCase()) { already = true; break; }
       }
-      if (!alreadyEaten) notEaten.push(item);
+      if (!already) pool.push(item);
     }
-
-    // Берём до 3 предложений на категорию
-    var picks = notEaten.slice(0, Math.min(3, gap));
-    if (picks.length > 0) {
+    if (pool.length > 0) {
       suggestions.push({
-        cat: cat.name,
-        icon: cat.icon,
-        color: cat.color,
-        items: picks,
-        eaten: eatenInCat.length,
-        target: target
+        cat: cat.name, icon: cat.icon, color: cat.color,
+        pool: pool, // полный пул для замены
+        picks: pool.slice(0, Math.min(3, gap)), // текущие показанные
+        pickIdxs: [0, 1, 2].slice(0, Math.min(3, gap)), // индексы в пуле
+        eaten: eatenInCat.length, target: target
       });
     }
   }
@@ -822,72 +881,386 @@ function showShoppingList() {
   overlay.id = 'shopping-popup';
   overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:2000;display:flex;align-items:flex-end;justify-content:center;';
 
-  var listText = '🛒 Plural — список покупок\n' + new Date().toLocaleDateString('ru', {day:'numeric', month:'long'}) + '\n\n';
-  var innerHtml = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
-    + '<div style="font-size:16px;font-weight:600">Список покупок</div>'
-    + '<button onclick="document.getElementById(\'shopping-popup\').remove()" style="background:none;border:none;font-size:22px;color:#bbb;cursor:pointer">×</button>'
-    + '</div>'
-    + '<div style="font-size:13px;color:#888;margin-bottom:16px">Продукты которых не хватает для разнообразной недели</div>';
-
-  if (suggestions.length === 0) {
-    innerHtml += '<div style="text-align:center;padding:20px 0;font-size:14px;color:#2d7a3a;font-weight:500">Отличная неделя — все категории закрыты!</div>';
-    listText += 'Все категории закрыты — отличная неделя!';
-  } else {
+  function buildListText() {
+    var t = '🛒 Plural — список покупок\n' + new Date().toLocaleDateString('ru', {day:'numeric', month:'long'}) + '\n\n';
     for (var si = 0; si < suggestions.length; si++) {
       var s = suggestions[si];
-      listText += s.icon + ' ' + s.cat + ':\n';
-      innerHtml += '<div style="margin-bottom:14px">'
-        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
-        + '<div style="display:flex;align-items:center;gap:6px">'
-        + '<span style="font-size:15px">' + s.icon + '</span>'
-        + '<span style="font-size:13px;font-weight:600;color:#1a1a1a">' + s.cat + '</span>'
-        + '</div>'
-        + '<span style="font-size:11px;color:#bbb">' + s.eaten + ' из ' + s.target + ' съедено</span>'
-        + '</div>'
-        + '<div style="display:flex;flex-wrap:wrap;gap:6px">';
-      for (var ii = 0; ii < s.items.length; ii++) {
-        innerHtml += '<div style="padding:6px 12px;background:#f7f7f5;border:1px solid #e0e0e0;border-radius:99px;font-size:13px;color:#333">'
-          + s.items[ii] + '</div>';
-        listText += '  • ' + s.items[ii] + '\n';
-      }
-      innerHtml += '</div></div>';
-      listText += '\n';
+      t += s.icon + ' ' + s.cat + ':\n';
+      for (var ii = 0; ii < s.picks.length; ii++) t += '  • ' + s.picks[ii] + '\n';
+      t += '\n';
     }
+    return t;
   }
 
-  innerHtml += '<div style="display:flex;gap:8px;margin-top:4px">'
-    + '<button id="shop-copy" style="flex:1;padding:12px;background:#f0f9f2;border:1px solid #c8e6c9;border-radius:12px;font-size:14px;color:#2d7a3a;cursor:pointer;font-weight:500">Скопировать</button>'
-    + '<button id="shop-share" style="flex:1;padding:12px;background:#2d7a3a;border:none;border-radius:12px;font-size:14px;color:#fff;cursor:pointer;font-weight:500">Поделиться</button>'
-    + '</div>';
+  function buildInnerHtml() {
+    var h = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+      + '<div style="font-size:16px;font-weight:600">Список покупок</div>'
+      + '<button onclick="document.getElementById(\'shopping-popup\').remove()" style="background:none;border:none;font-size:22px;color:#bbb;cursor:pointer">×</button>'
+      + '</div>'
+      + '<div style="font-size:13px;color:#888;margin-bottom:16px">Тапни на продукт чтобы заменить на другой</div>';
 
-  overlay.innerHTML = '<div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;">'
-    + innerHtml + '</div>';
+    if (suggestions.length === 0) {
+      h += '<div style="text-align:center;padding:20px 0;font-size:14px;color:#2d7a3a;font-weight:500">Отличная неделя — все категории закрыты!</div>';
+    } else {
+      for (var si = 0; si < suggestions.length; si++) {
+        var s = suggestions[si];
+        h += '<div style="margin-bottom:14px">'
+          + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+          + '<div style="display:flex;align-items:center;gap:6px">'
+          + '<span style="font-size:15px">' + s.icon + '</span>'
+          + '<span style="font-size:13px;font-weight:600;color:#1a1a1a">' + s.cat + '</span>'
+          + '</div>'
+          + '<span style="font-size:11px;color:#bbb">' + s.eaten + ' из ' + s.target + '</span>'
+          + '</div>'
+          + '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+        for (var ii = 0; ii < s.picks.length; ii++) {
+          h += '<div class="shop-item" data-si="' + si + '" data-ii="' + ii + '" '
+            + 'style="padding:6px 12px;background:#f7f7f5;border:1px solid #e0e0e0;border-radius:99px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:5px;">'
+            + s.picks[ii]
+            + '<span style="font-size:10px;color:#bbb">↻</span>'
+            + '</div>';
+        }
+        h += '</div></div>';
+      }
+    }
+
+    h += '<div style="display:flex;gap:8px;margin-top:8px">'
+      + '<button id="shop-copy" style="flex:1;padding:12px;background:#f0f9f2;border:1px solid #c8e6c9;border-radius:12px;font-size:14px;color:#2d7a3a;cursor:pointer;font-weight:500">Скопировать</button>'
+      + '<button id="shop-share" style="flex:1;padding:12px;background:#2d7a3a;border:none;border-radius:12px;font-size:14px;color:#fff;cursor:pointer;font-weight:500">Поделиться</button>'
+      + '</div>';
+    return h;
+  }
+
+  function rerenderInner() {
+    var inner = overlay.querySelector('.shop-inner');
+    inner.innerHTML = buildInnerHtml();
+    bindEvents();
+  }
+
+  function bindEvents() {
+    // Замена продукта по тапу
+    var items = overlay.querySelectorAll('.shop-item');
+    for (var i = 0; i < items.length; i++) {
+      items[i].addEventListener('click', function() {
+        var si = parseInt(this.getAttribute('data-si'));
+        var ii = parseInt(this.getAttribute('data-ii'));
+        var s = suggestions[si];
+        // Найти следующий в пуле который ещё не показан
+        var currentPicks = s.picks.slice();
+        var currentIdx = s.pickIdxs[ii];
+        var nextIdx = (currentIdx + 1) % s.pool.length;
+        var tries = 0;
+        while (tries < s.pool.length) {
+          var alreadyShown = false;
+          for (var jj = 0; jj < s.pickIdxs.length; jj++) {
+            if (jj !== ii && s.pickIdxs[jj] === nextIdx) { alreadyShown = true; break; }
+          }
+          if (!alreadyShown) break;
+          nextIdx = (nextIdx + 1) % s.pool.length;
+          tries++;
+        }
+        s.picks[ii] = s.pool[nextIdx];
+        s.pickIdxs[ii] = nextIdx;
+        rerenderInner();
+      });
+    }
+
+    overlay.querySelector('#shop-copy').addEventListener('click', function() {
+      var text = buildListText();
+      navigator.clipboard.writeText(text).then(function() {
+        var btn = overlay.querySelector('#shop-copy');
+        btn.textContent = 'Скопировано!';
+        setTimeout(function() { btn.textContent = 'Скопировать'; }, 2000);
+      }).catch(function() { prompt('Скопируй список:', text); });
+    });
+
+    overlay.querySelector('#shop-share').addEventListener('click', function() {
+      var text = buildListText();
+      if (navigator.share) {
+        navigator.share({title: 'Список покупок Plural', text: text}).catch(function(){});
+      } else {
+        navigator.clipboard.writeText(text).then(function() {
+          alert('Список скопирован');
+        });
+      }
+    });
+  }
+
+  overlay.innerHTML = '<div class="shop-inner" style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;">'
+    + buildInnerHtml() + '</div>';
 
   document.body.appendChild(overlay);
   overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+  bindEvents();
+}
 
-  overlay.querySelector('#shop-copy').addEventListener('click', function() {
-    navigator.clipboard.writeText(listText).then(function() {
-      var btn = overlay.querySelector('#shop-copy');
-      btn.textContent = 'Скопировано!';
-      setTimeout(function() { btn.textContent = 'Скопировать'; }, 2000);
-    }).catch(function() { prompt('Скопируй список:', listText); });
-  });
+var BRISTOL_TYPES = [
+  { id:1, label:'Тип 1–2', desc:'Твёрдый, редкий', color:'#c62828',
+    svg:'<svg width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="10" r="5" fill="#c62828"/><circle cx="11" cy="22" r="4" fill="#c62828"/><circle cx="25" cy="24" r="4" fill="#c62828"/></svg>' },
+  { id:2, label:'Тип 3–4', desc:'Норма, легко', color:'#2d7a3a',
+    svg:'<svg width="36" height="36" viewBox="0 0 36 36"><ellipse cx="18" cy="20" rx="9" ry="6" fill="#2d7a3a"/><ellipse cx="18" cy="16" rx="7" ry="5" fill="#2d7a3a"/><ellipse cx="18" cy="12" rx="5" ry="4" fill="#2d7a3a"/></svg>' },
+  { id:3, label:'Тип 5–6', desc:'Мягкий, срочно', color:'#f57f17',
+    svg:'<svg width="36" height="36" viewBox="0 0 36 36"><ellipse cx="18" cy="22" rx="12" ry="5" fill="#f57f17"/><ellipse cx="18" cy="17" rx="9" ry="4" fill="#f57f17"/><ellipse cx="18" cy="13" rx="6" ry="3" fill="#f57f17"/></svg>' },
+  { id:4, label:'Тип 7', desc:'Жидкий', color:'#e53935',
+    svg:'<svg width="36" height="36" viewBox="0 0 36 36"><ellipse cx="18" cy="24" rx="13" ry="4" fill="#e53935" opacity="0.5"/><ellipse cx="18" cy="20" rx="11" ry="3" fill="#e53935" opacity="0.6"/><ellipse cx="18" cy="16" rx="8" ry="3" fill="#e53935" opacity="0.7"/></svg>' }
+];
 
-  overlay.querySelector('#shop-share').addEventListener('click', function() {
-    if (navigator.share) {
-      navigator.share({title: 'Список покупок Plural', text: listText}).catch(function(){});
-    } else {
-      navigator.clipboard.writeText(listText).then(function() {
-        alert('Список скопирован в буфер обмена');
-      });
+var ENERGY_LABELS = [
+  '', // placeholder for index 0
+  'Еле встал. Тяжесть весь день, сложно сосредоточиться, хочется лечь.',
+  'Вялость, нет мотивации. К вечеру совсем пусто.',
+  'Нормально. Справляюсь, без особого подъёма.',
+  'Бодро и продуктивно. Лёгкость, хорошее настроение.',
+  'Высокая энергия весь день. Фокус, драйв, хочется двигаться.'
+];
+
+function wellnessKey() { return 'plural_wellness_' + localDateStr(new Date()); }
+function loadWellness(isoDate) {
+  try { var r = localStorage.getItem('plural_wellness_' + isoDate); return r ? JSON.parse(r) : null; } catch(e) { return null; }
+}
+function saveWellness(data) { localStorage.setItem(wellnessKey(), JSON.stringify(data)); }
+function loadWeekWellness() {
+  var mon = currentMonday(); var days = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(mon.getTime()); d.setDate(mon.getDate() + i);
+    var iso = localDateStr(d);
+    days.push({ iso: iso, label: DAY_NAMES[d.getDay()], data: loadWellness(iso), isToday: iso === todayStr() });
+  }
+  return days;
+}
+
+function showWellnessPopup() {
+  var existing = document.getElementById('wellness-popup');
+  if (existing) { existing.remove(); return; }
+  var today = loadWellness(todayStr()) || {};
+
+  var overlay = document.createElement('div');
+  overlay.id = 'wellness-popup';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:2000;display:flex;align-items:flex-end;justify-content:center;';
+
+  var state = {
+    bloating: today.bloating || 0,       // 0=нет 1=лёгкое 2=сильное
+    bloatingTime: today.bloatingTime || [], // утром после_еды весь_день
+    bristol: today.bristol || 0,          // 1-4 (индекс типа)
+    stoolFreq: today.stoolFreq || 0,      // 0=реже 1=1-2 раза 2=3+
+    energy: today.energy || 0             // 1-5
+  };
+
+  function html() {
+    var h = '<div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">'
+      + '<div style="font-size:16px;font-weight:600">Самочувствие сегодня</div>'
+      + '<button id="wclose" style="background:none;border:none;font-size:22px;color:#bbb;cursor:pointer">×</button>'
+      + '</div>';
+
+    // ВЗДУТИЕ
+    h += '<div style="margin-bottom:20px">'
+      + '<div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:10px">Вздутие</div>'
+      + '<div style="display:flex;gap:8px;margin-bottom:10px">';
+    var bloatOpts = [{v:0,l:'Нет'},{v:1,l:'Лёгкое'},{v:2,l:'Сильное'}];
+    for (var i = 0; i < bloatOpts.length; i++) {
+      var sel = state.bloating === bloatOpts[i].v;
+      h += '<button class="w-bloat" data-v="'+bloatOpts[i].v+'" style="flex:1;padding:9px 6px;border-radius:10px;border:1px solid '+(sel?'#5c6bc0':'#e0e0e0')+';background:'+(sel?'#f0f4ff':'#f7f7f5')+';font-size:13px;color:'+(sel?'#5c6bc0':'#555')+';cursor:pointer;font-weight:'+(sel?'600':'400')+'">'+bloatOpts[i].l+'</button>';
     }
-  });
+    h += '</div>';
+    if (state.bloating > 0) {
+      h += '<div style="font-size:12px;color:#888;margin-bottom:6px">Когда?</div>'
+        + '<div style="display:flex;gap:6px">';
+      var timeOpts = [{v:'утром',l:'Утром'},{v:'после_еды',l:'После еды'},{v:'весь_день',l:'Весь день'}];
+      for (var i = 0; i < timeOpts.length; i++) {
+        var tsel = state.bloatingTime.indexOf(timeOpts[i].v) >= 0;
+        h += '<button class="w-btime" data-v="'+timeOpts[i].v+'" style="flex:1;padding:7px 4px;border-radius:10px;border:1px solid '+(tsel?'#5c6bc0':'#e0e0e0')+';background:'+(tsel?'#f0f4ff':'#f7f7f5')+';font-size:12px;color:'+(tsel?'#5c6bc0':'#555')+';cursor:pointer;font-weight:'+(tsel?'600':'400')+'">'+timeOpts[i].l+'</button>';
+      }
+      h += '</div>';
+    }
+    h += '</div>';
+
+    // СТУЛ
+    h += '<div style="margin-bottom:20px">'
+      + '<div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:10px">Стул (Бристольская шкала)</div>'
+      + '<div style="display:flex;gap:8px;margin-bottom:12px">';
+    for (var i = 0; i < BRISTOL_TYPES.length; i++) {
+      var bt = BRISTOL_TYPES[i];
+      var bsel = state.bristol === bt.id;
+      h += '<button class="w-bristol" data-v="'+bt.id+'" style="flex:1;padding:8px 4px;border-radius:12px;border:2px solid '+(bsel?bt.color:'#e0e0e0')+';background:'+(bsel?'#fff8':'#f7f7f5')+';cursor:pointer;text-align:center;">'
+        + bt.svg
+        + '<div style="font-size:10px;font-weight:600;color:'+(bsel?bt.color:'#aaa');h+=';margin-top:3px">'+bt.label+'</div>'
+        + '<div style="font-size:9px;color:'+(bsel?bt.color:'#bbb')+'">'+bt.desc+'</div>'
+        + '</button>';
+    }
+    h += '</div>';
+    h += '<div style="font-size:12px;color:#888;margin-bottom:6px">Частота сегодня</div>'
+      + '<div style="display:flex;gap:8px">';
+    var freqOpts = [{v:0,l:'Реже 1 раза'},{v:1,l:'1–2 раза'},{v:2,l:'3+ раз'}];
+    for (var i = 0; i < freqOpts.length; i++) {
+      var fsel = state.stoolFreq === freqOpts[i].v;
+      h += '<button class="w-freq" data-v="'+freqOpts[i].v+'" style="flex:1;padding:8px 4px;border-radius:10px;border:1px solid '+(fsel?'#5c6bc0':'#e0e0e0')+';background:'+(fsel?'#f0f4ff':'#f7f7f5')+';font-size:12px;color:'+(fsel?'#5c6bc0':'#555')+';cursor:pointer;font-weight:'+(fsel?'600':'400')+'">'+freqOpts[i].l+'</button>';
+    }
+    h += '</div></div>';
+
+    // ЭНЕРГИЯ
+    h += '<div style="margin-bottom:24px">'
+      + '<div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:10px">Энергия за день</div>'
+      + '<div style="display:flex;gap:6px;margin-bottom:8px">';
+    for (var i = 1; i <= 5; i++) {
+      var esel = state.energy === i;
+      h += '<button class="w-energy" data-v="'+i+'" style="flex:1;padding:10px 4px;border-radius:10px;border:2px solid '+(esel?'#5c6bc0':'#e0e0e0')+';background:'+(esel?'#f0f4ff':'#f7f7f5')+';font-size:18px;cursor:pointer;">'+i+'</button>';
+    }
+    h += '</div>';
+    if (state.energy > 0) {
+      h += '<div style="font-size:12px;color:#888;padding:8px 12px;background:#f7f7f5;border-radius:8px;line-height:1.5">' + ENERGY_LABELS[state.energy] + '</div>';
+    }
+    h += '</div>';
+
+    var filled = state.bloating !== null && state.bristol > 0 && state.energy > 0;
+    h += '<button id="wsave" style="width:100%;padding:13px;background:'+(filled?'#5c6bc0':'#c5c8f6')+';color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:'+(filled?'pointer':'default')+'">Сохранить</button>';
+    h += '</div>';
+    return h;
+  }
+
+  function rerender() {
+    overlay.innerHTML = html();
+    bindW();
+  }
+
+  function bindW() {
+    overlay.querySelector('#wclose').onclick = function() { overlay.remove(); };
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+
+    var bb = overlay.querySelectorAll('.w-bloat');
+    for (var i = 0; i < bb.length; i++) bb[i].addEventListener('click', function() {
+      state.bloating = parseInt(this.getAttribute('data-v'));
+      if (state.bloating === 0) state.bloatingTime = [];
+      rerender();
+    });
+
+    var bt2 = overlay.querySelectorAll('.w-btime');
+    for (var i = 0; i < bt2.length; i++) bt2[i].addEventListener('click', function() {
+      var v = this.getAttribute('data-v');
+      var idx = state.bloatingTime.indexOf(v);
+      if (idx >= 0) state.bloatingTime.splice(idx, 1); else state.bloatingTime.push(v);
+      rerender();
+    });
+
+    var brist = overlay.querySelectorAll('.w-bristol');
+    for (var i = 0; i < brist.length; i++) brist[i].addEventListener('click', function() {
+      state.bristol = parseInt(this.getAttribute('data-v')); rerender();
+    });
+
+    var freq = overlay.querySelectorAll('.w-freq');
+    for (var i = 0; i < freq.length; i++) freq[i].addEventListener('click', function() {
+      state.stoolFreq = parseInt(this.getAttribute('data-v')); rerender();
+    });
+
+    var en = overlay.querySelectorAll('.w-energy');
+    for (var i = 0; i < en.length; i++) en[i].addEventListener('click', function() {
+      state.energy = parseInt(this.getAttribute('data-v')); rerender();
+    });
+
+    var saveBtn = overlay.querySelector('#wsave');
+    if (saveBtn) saveBtn.addEventListener('click', function() {
+      if (state.bristol === 0 || state.energy === 0) return;
+      saveWellness(state);
+      overlay.remove();
+      renderWellness();
+    });
+  }
+
+  overlay.innerHTML = html();
+  document.body.appendChild(overlay);
+  bindW();
+}
+
+function renderWellness() {
+  var days = loadWeekWellness();
+  var el = document.getElementById('wellnessCard');
+  var hasAny = false;
+  for (var i = 0; i < days.length; i++) if (days[i].data) { hasAny = true; break; }
+
+  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
+    + '<div class="slabel" style="margin-bottom:0">Самочувствие</div>'
+    + (hasAny ? '' : '<div style="font-size:12px;color:#bbb">Заполни первый день</div>')
+    + '</div>';
+
+  if (!hasAny) {
+    el.innerHTML = html + '<div style="font-size:13px;color:#ccc;text-align:center;padding:12px 0">Нажми «Самочувствие сегодня» чтобы начать отслеживать</div>';
+    return;
+  }
+
+  // Графики энергии и вздутия по дням
+  html += '<div style="margin-bottom:14px">'
+    + '<div style="font-size:11px;color:#aaa;margin-bottom:6px">Энергия</div>'
+    + '<div style="display:flex;align-items:flex-end;gap:5px;height:52px">';
+  for (var i = 0; i < days.length; i++) {
+    var d = days[i], e = d.data ? d.data.energy : 0;
+    var h = e > 0 ? Math.round(e / 5 * 44) : 2;
+    var col = d.isToday ? '#5c6bc0' : '#c5c8f6';
+    html += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end">'
+      + '<div style="font-size:10px;font-weight:600;color:'+(e>0?'#5c6bc0':'#ddd')+'">'+(e>0?e:'—')+'</div>'
+      + '<div style="width:100%;border-radius:3px 3px 0 0;background:'+col+';height:'+h+'px"></div>'
+      + '<div style="font-size:10px;color:#bbb">'+d.label+'</div>'
+      + '</div>';
+  }
+  html += '</div></div>';
+
+  // Вздутие по дням
+  html += '<div style="margin-bottom:14px">'
+    + '<div style="font-size:11px;color:#aaa;margin-bottom:6px">Вздутие</div>'
+    + '<div style="display:flex;gap:5px">';
+  var bloatColors = ['#e8f5ee','#fff8e1','#ffebee'];
+  var bloatLabels = ['Нет','Лёгкое','Сильное'];
+  for (var i = 0; i < days.length; i++) {
+    var d = days[i], bv = d.data ? d.data.bloating : -1;
+    var bg = bv >= 0 ? bloatColors[bv] : '#f7f7f5';
+    var tc = bv >= 0 ? ['#2d7a3a','#f57f17','#c62828'][bv] : '#ddd';
+    html += '<div style="flex:1;border-radius:8px;background:'+bg+';padding:5px 2px;text-align:center">'
+      + '<div style="font-size:9px;color:'+tc+';font-weight:600;line-height:1.3">'+(bv>=0?bloatLabels[bv]:'—')+'</div>'
+      + '<div style="font-size:9px;color:#bbb">'+d.label+'</div>'
+      + '</div>';
+  }
+  html += '</div></div>';
+
+  // Корреляция
+  var corrDays = days.filter(function(d) { return d.data && d.data.energy > 0; });
+  if (corrDays.length >= 3) {
+    var log = loadWeek(currentMonday());
+    var u = uniq(log);
+    var dailyPrebiotic = {};
+    var mon2 = currentMonday();
+    for (var i = 0; i < 7; i++) {
+      var dd = new Date(mon2.getTime()); dd.setDate(mon2.getDate() + i);
+      dailyPrebiotic[localDateStr(dd)] = 0;
+    }
+    for (var i = 0; i < u.length; i++) {
+      if (u[i].isoDate && dailyPrebiotic[u[i].isoDate] !== undefined) {
+        dailyPrebiotic[u[i].isoDate] += getPrebioticScore(u[i].name);
+      }
+    }
+    var highPreb = corrDays.filter(function(d) { return dailyPrebiotic[d.iso] >= 6; });
+    var lowPreb = corrDays.filter(function(d) { return dailyPrebiotic[d.iso] < 6; });
+    var avgHigh = highPreb.length > 0 ? Math.round(highPreb.reduce(function(s,d){ return s+d.data.energy; },0) / highPreb.length * 10) / 10 : null;
+    var avgLow = lowPreb.length > 0 ? Math.round(lowPreb.reduce(function(s,d){ return s+d.data.energy; },0) / lowPreb.length * 10) / 10 : null;
+
+    if (avgHigh !== null && avgLow !== null && highPreb.length >= 1 && lowPreb.length >= 1) {
+      var diff = Math.round((avgHigh - avgLow) * 10) / 10;
+      var insight = diff > 0
+        ? 'В дни с высоким пребиотическим индексом энергия в среднем на ' + diff + ' балла выше'
+        : diff < 0
+        ? 'Пока нет чёткой связи между питанием и энергией — продолжай заполнять'
+        : 'Связь между питанием и энергией пока не выражена';
+      html += '<div style="background:#f0f4ff;border-radius:10px;padding:10px 12px;font-size:12px;color:#5c6bc0;line-height:1.5">'
+        + '📊 ' + insight + '</div>';
+    }
+  } else if (corrDays.length > 0) {
+    html += '<div style="font-size:12px;color:#bbb;text-align:center;padding:4px 0">Заполни ещё ' + (3 - corrDays.length) + ' дня чтобы увидеть корреляцию с питанием</div>';
+  }
+
+  el.innerHTML = html;
 }
 
 function render() {
   var log = loadWeek(currentMonday());
-  renderMain(log); renderFiber(log); renderMicrobiome(log); renderRainbow(log); renderDynamics(); renderCatGrid(log); renderChips(); renderFreq(log);
+  renderMain(log); renderFiber(log); renderMicrobiome(log); renderRainbow(log); renderDynamics(); renderCatGrid(log); renderChips(); renderFreq(log); renderWellness();
 }
 
 function addItem(name, cat, grams, cooked) {
@@ -914,6 +1287,7 @@ document.getElementById('addBtn').addEventListener('click', function() {
 document.getElementById('inp').addEventListener('keydown', function(e) {
   if (e.key==='Enter') { var n=this.value.trim(); if(!n) return; var g=parseInt(document.getElementById('grams').value)||null; addItem(n,null,g,false); this.value=''; document.getElementById('grams').value=''; }
 });
+document.getElementById('wellnessBtn').addEventListener('click', showWellnessPopup);
 document.getElementById('shopBtn').addEventListener('click', showShoppingList);
 document.getElementById('resetBtn').addEventListener('click', function() {
   if (confirm('Сбросить все продукты этой недели?')) { localStorage.removeItem(storageKey(currentMonday())); render(); }
